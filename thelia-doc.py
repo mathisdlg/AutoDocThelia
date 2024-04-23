@@ -3,12 +3,13 @@ import hooks, events
 
 
 def help():
-    print("This is the documentation manager. Here are the commands you can use:")
+    print("\nThis is the documentation manager. Here are the commands you can use:")
     print("[1] - help: Display this help message")
     print("[2] - go to hooks documentation manager")
     print("[3] - generate events documentation")
     print("[4] - generate events and hooks documentation")
-    print("[0] - exit: Exit the program")
+    print("")
+    print("[0] - exit: Exit the program\n")
 
 
 if __name__ == '__main__':
