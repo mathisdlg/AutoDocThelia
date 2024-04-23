@@ -1,12 +1,13 @@
-import sys
-import hooks
+import sys, os
+import hooks, events
 
 
 def help():
     print("This is the documentation manager. Here are the commands you can use:")
     print("[1] - help: Display this help message")
     print("[2] - go to hooks documentation manager")
-    print("[3] - go to event documentation manager")
+    print("[3] - generate events documentation")
+    print("[4] - generate events and hooks documentation")
     print("[0] - exit: Exit the program")
 
 
@@ -24,8 +25,10 @@ if __name__ == '__main__':
             case '2':
                 hooks.main()
             case '3':
-                raise NotImplementedError("Event documentation manager is not implemented yet.")
-                # events.main()
+                events.main()
+            case '4':
+                events.main()
+                hooks.all()
             case _:
                 print("Invalid choice. Please try again.\n")
                 continue
