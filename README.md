@@ -107,6 +107,7 @@ When you choose to generate hook documentation, the program will ask you again t
 ### Scan
 
 The scan function scans the directory passed on the command line to find hooks and list them in a txt file.
+
 ```
 > Enter the directory to scan: <The root path of the project to scan> 
 > Enter the file to write the hooks in [log.txt] : <The name of the txt file to write the hooks in>.
@@ -157,6 +158,7 @@ This Bash script extracts events from Thelia along with some of their informatio
   - If a file does not contain a constructor, the message 'no constructor found in this file' replaces the arguments.  
 
 Example:
+
 ```
 [[no_category, event1],[folderName1,- event1 -> $argument1 \n-  Event2 -> no constructor found in this file\n]]
 ```
@@ -166,9 +168,11 @@ Example:
 ```bash
 ./eventExtractor.sh <path/to/events/directory> [output_file_name.txt]
 ```
+
 - <path/to/events/directory>: Path to the directory containing Thelia events.
 - [output_file_name.md] (optional): Name of the output text file. If not provided, the default name dataArrayEvent.txt will be used.  
 Exemple:
+
 ```bash
 ./eventExtractor.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
 ```
