@@ -92,6 +92,9 @@ Exemple:
 ./eventExtractor.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
 ```
 
+**⚠️ Attention:**
+Le chemin fournit en parametre du script (celui pour accéder au dossier Event) apparait dans la documentation lors de sa génération (dans le chemin des évènements remplacant ceux dépréciés).
+
 # English documentation
 
 This python program generates the documentation for a Thelia project from its source files.
@@ -188,3 +191,6 @@ Exemple:
 ```bash
 ./eventExtractor.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
 ```
+
+**⚠️ Warning:**
+The path provided as a parameter of the script (the one to access the Event folder) appears in the documentation when it is generated (in the path of events replacing those deprecated).
