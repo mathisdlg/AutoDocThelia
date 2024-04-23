@@ -185,7 +185,66 @@ def integrate(fromFile: str, toFile: str) -> None:
             fileToWrite.writelines(content[0:index])
             for line in file.readlines():
                 fileToWrite.write(line)
-        
+
+
+def all() -> None:
+    directory = input("Enter the directory to scan: ")
+
+    file = input("Enter the file to read the hooks from [log.txt] : ")
+    markdownFile = input("Enter the file to write the hooks in [hooks.md] : ")
+
+    toFile = input("Enter the file to write the hooks in [documentation.md] : ")
+
+    order = input("Do you want to sort the hooks by key [Y/n] : ").lower()
+
+    if not directory.startswith("./"):
+        directory = "./"+directory
+    if file == "":
+        file = "log.txt"
+    if markdownFile == "":
+        markdownFile = "hooks.md"
+    if toFile == "":
+        toFile = "documentation.md"
+
+    try:
+        get_hooks(directory, file)
+        print("Hooks successfully extracted.")
+    except ValueError as e:
+        ...
+    except FileNotFoundError as e:
+        ...
+    except Exception as e:
+        print("An error occured get_hooks.\n", e)
+
+    try:
+        hooks = get_from_logs(file)
+        if order != "n":
+            hooks = sort_dict_hook(hooks)
+        counter = format_md_hooks(hooks, markdownFile)
+        print(f"{counter} hooks successfully formatted.")
+    except Exception as e:
+        print("An error occured in get_from_logs.\n", e)
+
+    try:
+        integrate(markdownFile, toFile)
+        print("Hooks successfully integrated.")
+    except Exception as e:
+        print("An error occured in integrate.\n", e)
+
+
+def clean() -> None:
+    removed = False
+    if os.path.exists("log.txt"):
+        os.remove("log.txt")
+        removed = True
+    if os.path.exists("hooks.md"):
+        os.remove("hooks.md")
+        removed = True
+    if removed:
+        print("Files successfully removed.")
+    else:
+        print("No files to remove.")
+
 
 def help() -> None:
     """
@@ -271,71 +330,19 @@ def main() -> None:
                     print("Hooks successfully integrated.")
                 except Exception as e:
                     print("An error occured.\n", e)
-            
+
             case "5":
-                directory = input("Enter the directory to scan: ")
+                all()
 
-                file = input("Enter the file to read the hooks from [log.txt] : ")
-                markdownFile = input("Enter the file to write the hooks in [hooks.md] : ")
-
-                toFile = input("Enter the file to write the hooks in [documentation.md] : ")
-
-                order = input("Do you want to sort the hooks by key [Y/n] : ").lower()
-
-                if not directory.startswith("./"):
-                    directory = "./"+directory
-                if file == "":
-                    file = "log.txt"
-                if markdownFile == "":
-                    markdownFile = "hooks.md"
-                if toFile == "":
-                    toFile = "documentation.md"
-
-                try:
-                    get_hooks(directory, file)
-                    print("Hooks successfully extracted.")
-                except ValueError as e:
-                    ...
-                except FileNotFoundError as e:
-                    ...
-                except Exception as e:
-                    print("An error occured get_hooks.\n", e)
-
-                try:
-                    hooks = get_from_logs(file)
-                    if order != "n":
-                        hooks = sort_dict_hook(hooks)
-                    counter = format_md_hooks(hooks, markdownFile)
-                    print(f"{counter} hooks successfully formatted.")
-                except Exception as e:
-                    print("An error occured in get_from_logs.\n", e)
-
-                try:
-                    integrate(markdownFile, toFile)
-                    print("Hooks successfully integrated.")
-                except Exception as e:
-                    print("An error occured in integrate.\n", e)
-            
             case "6":
-                removed = False
-                if os.path.exists("log.txt"):
-                    os.remove("log.txt")
-                    removed = True
-                if os.path.exists("hooks.md"):
-                    os.remove("hooks.md")
-                    removed = True
-                if removed:
-                    print("Files successfully removed.")
-                else:
-                    print("No files to remove.")
+                clean()
             
             case _:
                 print("Invalid choice. Please try again.")
                 continue
 
-    print("Goodbye!\n")
-
 
 if __name__ == "__main__":
     main()
+    print("Goodbye!\n")
     sys.exit()
