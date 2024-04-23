@@ -14,6 +14,7 @@ def help():
 
 if __name__ == '__main__':
     print("Welcome to the documentation manager!")
+    help()
     while True:
         choice = input("What would you like to do ([1] - help): ")
         
@@ -30,6 +31,7 @@ if __name__ == '__main__':
             case '4':
                 events.main()
                 hooks.all()
+                hooks.clean()
             case _:
                 print("Invalid choice. Please try again.\n")
                 continue
