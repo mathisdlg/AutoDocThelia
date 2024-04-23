@@ -24,7 +24,7 @@ Le format permet de formater le fichier txt généré par le scan en fichier mar
 
 ### Integrate
 
-L'ibntegrate permet de prendre le fichier mardown généré par le format et de l'intégrer dans un fichier md donné en ligne de commande.
+L'integrate permet de prendre le fichier mardown généré par le format et de l'intégrer dans un fichier md donné en ligne de commande.
 
 ### All
 
