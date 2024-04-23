@@ -31,6 +31,7 @@ if __name__ == '__main__':
             case '4':
                 events.main()
                 hooks.all()
+                hooks.clean()
             case _:
                 print("Invalid choice. Please try again.\n")
                 continue
