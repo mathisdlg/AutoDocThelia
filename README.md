@@ -75,12 +75,18 @@ Exemple:
 
 ### Utilisation
 
-```./eventExtractor.sh <chemin/vers/le/répertoire/événements> [nom_fichier_sortie.txt]```
+```bash
+./eventExtractor.sh <chemin/vers/le/répertoire/événements> [nom_fichier_sortie.txt]
+```
 - <chemin/vers/le/répertoire/événements> : Chemin vers le répertoire contenant les événements Thelia.
 - [nom_fichier_sortie.md] (optionnel) : Nom du fichier texte de sortie. S'il n'est pas fourni, le nom par défaut sera dataArrayEvent.txt sera utilisé.
 
 Exemple:
-```./eventExtractor.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md```
+```bash
+./eventExtractor.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
+```
+
+...
 
 # English documentation
 
@@ -157,9 +163,12 @@ Example:
 
 ### Usage
 
-```./eventExtractor.sh <path/to/events/directory> [output_file_name.txt]```
-
+```bash
+./eventExtractor.sh <path/to/events/directory> [output_file_name.txt]
+```
 - <path/to/events/directory>: Path to the directory containing Thelia events.
 - [output_file_name.md] (optional): Name of the output text file. If not provided, the default name dataArrayEvent.txt will be used.  
 Exemple:
-```./eventExtractor.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md```
+```bash
+./eventExtractor.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
+```
