@@ -74,13 +74,13 @@ Ce script Bash extrait les évènements de Thelia ainsi que certaines de leurs i
   - Le texte est écrit sous format markdown afin d'être affiché par la suite.
   - Les fichiers à la racines du dossier 'Event' se trouvent dans le premier tableau qui est nommé 'no_category'.  
   - Si un fichier ne contient pas de constructeur, le message 'no constructor found in this file' remplace les arguments.  
-Exemple:  
-```[[no_category, event1],[nomDossier1,- event1 -> $argument1 \n-  Event2 -> no constructor found in this file\n]]```
+Exemple de sortie:  
+```[[no_category, event1 -> $argument1 $argument2\n ],[nomDossier1,- event1 -> $argument1 \n-  Event2 -> no constructor found in this file\n]]```
 
 ### Utilisation
 
 ```bash
-./eventExtractor.sh <chemin/vers/le/répertoire/événements> [nom_fichier_sortie.txt]
+./eventPreAnalyzer.sh <chemin/vers/le/répertoire/événements> [nom_fichier_sortie.txt]
 ```
 
 - <chemin/vers/le/répertoire/événements> : Chemin vers le répertoire contenant les événements Thelia.
@@ -89,7 +89,7 @@ Exemple:
 Exemple:
 
 ```bash
-./eventExtractor.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
+./eventPreAnalyzer.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
 ```
 
 **⚠️ Attention:**
@@ -172,24 +172,22 @@ This Bash script extracts events from Thelia along with some of their informatio
   - Files at the root of the 'Event' folder are placed in the first array named 'no_category'.
   - If a file does not contain a constructor, the message 'no constructor found in this file' replaces the arguments.  
 
-Example:
+Example output:
 
-```
-[[no_category, event1],[folderName1,- event1 -> $argument1 \n-  Event2 -> no constructor found in this file\n]]
-```
+```[[no_category, event1 -> $argument1 $argument2\n ],[folderName1,- event1 -> $argument1 \n-  Event2 -> no constructor found in this file\n]]```
 
 ### Usage
 
 ```bash
-./eventExtractor.sh <path/to/events/directory> [output_file_name.txt]
+./eventPreAnalyzer.sh <path/to/events/directory> [output_file_name.txt]
 ```
 
 - <path/to/events/directory>: Path to the directory containing Thelia events.
 - [output_file_name.md] (optional): Name of the output text file. If not provided, the default name dataArrayEvent.txt will be used.  
-Exemple:
+Example:
 
 ```bash
-./eventExtractor.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
+./eventPreAnalyzer.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
 ```
 
 **⚠️ Warning:**
