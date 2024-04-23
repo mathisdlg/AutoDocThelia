@@ -232,6 +232,20 @@ def all() -> None:
         print("An error occured in integrate.\n", e)
 
 
+def clean() -> None:
+    removed = False
+    if os.path.exists("log.txt"):
+        os.remove("log.txt")
+        removed = True
+    if os.path.exists("hooks.md"):
+        os.remove("hooks.md")
+        removed = True
+    if removed:
+        print("Files successfully removed.")
+    else:
+        print("No files to remove.")
+
+
 def help() -> None:
     """
     This function display the help message
@@ -321,17 +335,7 @@ def main() -> None:
                 all()
 
             case "6":
-                removed = False
-                if os.path.exists("log.txt"):
-                    os.remove("log.txt")
-                    removed = True
-                if os.path.exists("hooks.md"):
-                    os.remove("hooks.md")
-                    removed = True
-                if removed:
-                    print("Files successfully removed.")
-                else:
-                    print("No files to remove.")
+                clean()
             
             case _:
                 print("Invalid choice. Please try again.")
