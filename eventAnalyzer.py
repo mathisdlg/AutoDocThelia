@@ -101,7 +101,6 @@ with open(sourceFile, "r") as file :
                 if categorySplit[-1] in ["management", "event", "events", "module", "modules"] and len(categorySplit) > 1:
                     index = category.find(categorySplit[-1])
                     category = category[0:index]
-                    print(category)
                 arrayEvent.append(category.capitalize())
             elif "* " in line and "/" not in line :
                 comment = ""
