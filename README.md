@@ -10,13 +10,14 @@ python3 thelia-doc.py
 
 Le programme va ensuite vous demander quel documentation vous souhaitez générer.
 
+```
+> What would you like to do ([1] - help): <1 pour Help, 2 pour Hooks, 3 pour Events, 4 pour All>
+```
+
 ## Hooks
 
 Quand vous choississez de générer la documentation des hooks le programme vous redemandera de choisir les actions que vous souhaitez faire.  
 
-```
-> What would you like to do ([1] - help): <1 pour Help, 2 pour Hooks, 3 pour Events>
-```
 
 ### Scan
 
@@ -107,13 +108,14 @@ python3 thelia-doc.py
 
 The program will then ask you what documentation you want to generate.
 
+```
+> What would you like to do ([1] - help): <1 for Help, 2 for Hooks, 3 for Events, 4 for All>
+```
+
 ## Hooks
 
 When you choose to generate hook documentation, the program will ask you again to select the actions you wish to take. 
 
-```
-> What would you like to do ([1] - help): <1 for Help, 2 for Hooks, 3 for Events>
-```
 
 ### Scan
 
