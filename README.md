@@ -1,6 +1,7 @@
 # Documentation Française
 
 Ce programme python permet de générer la documentation d'un projet Thelia à partir de ses fichiers sources.
+(Python 3.10+)
 
 ## Utilisation
 
