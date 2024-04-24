@@ -14,7 +14,7 @@ def main() -> None:
     if destination == "":
         destination = "parsedEvent2.md"
 
-    os.system("./eventPreAnalyzer.sh " + eventPath)
+    os.system("./eventPreAnalyzer.sh -r " + eventPath)
 
     if os.path.exists("dataArrayEvent.txt"):
         eventAnalyzer.main(source, destination)
