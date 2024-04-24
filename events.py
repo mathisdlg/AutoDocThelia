@@ -6,7 +6,7 @@ def main() -> None:
     """
     This is the event documentation generator.
     """
-    eventPath = input("Enter the path to the event file: ")
+    eventPath = input("Enter the path to the event directory: ")
     if not eventPath.endswith("/"):
         eventPath += "/"
     source = eventPath + "TheliaEvents.php"
