@@ -1,9 +1,15 @@
 #!/bin/bash
 
-# function to browse files in the current directory and retrieve informations
+# function to browse files in the current directory and retrieve information
 browse_files_current_directory() {
     local path=$1
     local output_file=$2
+
+    # check if path is valid
+    if [ ! -d "$path" ]; then
+        echo "Error: Directory '$path' not found."
+        exit 1
+    fi
 
     # browse all files in the current directory
     find "$path" -maxdepth 1 -type f ! -name ".*" | sort | while read file; do
@@ -30,18 +36,37 @@ browse_files_current_directory() {
 
 # check if the number of arguments is valid
 if [ $# -lt 1 ]; then
-    echo -n "Usage: $0 <path/to/Event/directory> [output_file_name.md]"
+    echo -n "Usage: $0 [-r] <path/to/Event/directory> [output_file_name.md]"
     exit 1
+fi
+
+# check if -r option is provided
+if [ "$1" = "-r" ]; then
+    replace=true
+    shift
+else
+    replace=false
 fi
 
 # path to the folder provided as argument
 path=$1
-output_file="dataArrayEvent.txt"
 
-# check if the name of the output file is given as argument and create it if it doesn't exist
+# check if the output file name is provided as an argument
 if [ $# -eq 2 ]; then
     output_file=$2
+else
+    output_file="dataArrayEvent.txt"
 fi
+
+# check if output file already exists
+if [ -e "$output_file" ] && [ "$replace" = true ]; then
+    rm "$output_file"
+elif [ -e "$output_file" ] && [ "$replace" = false ]; then
+    echo "Error: Output file '$output_file' already exists. Please choose a different name or use the -r option to replace it.
+    Usage: $0 [-r] <path/to/Event/directory> [output_file_name.md]"
+    exit 1
+fi
+
 
 echo -n "[[noCategory," >> "$output_file"
 
