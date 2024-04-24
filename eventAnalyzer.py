@@ -1,4 +1,5 @@
 import sys, os
+from Common import integrate
 
 help="eventAnalyser.py [SOURCE FILE] [DESTINATION FILE]"
 helpAccess="-h or --help to show help"
@@ -148,6 +149,9 @@ def main(sourceFile, saveFile):
         for event in arrayNoCategory :
             file.write("**" + event[0] + "** : \n" + event[1] + "\n\n")
         file.write("</details>\n\n")
+    
+    docFile = input("Enter the documentation file to modify : ")
+    integrate(saveFile, docFile, "Every event list")
 
         
 if __name__ == "__main__":
