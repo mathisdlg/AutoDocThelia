@@ -11,8 +11,16 @@ browse_files_current_directory() {
         exit 1
     fi
 
+
     # browse all files in the current directory
     find "$path" -maxdepth 1 -type f ! -name ".*" | sort | while read file; do
+
+        # check if the file extension is php
+        if [ "$(basename "$file" | awk -F . '{print $NF}')" != "php" ]; then
+            echo "Error: the file '$file' is not a php file."
+            exit 1
+        fi
+
         # check if the file contains '@deprecated'
         if grep -q '@deprecated' "$file"; then
             class=$(grep -o -m 1 'class\s*\(\w\+\)' "$file" | sed 's/class\s*//')
