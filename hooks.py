@@ -65,9 +65,9 @@ def get_from_logs(file: str) -> dict:
             line = line.strip()
             # if the line starts with a dot, it is a key
             if line.startswith("."):
-                lineSplit = line.split("/")
-                office = lineSplit[lineSplit.index("templates")+1]
-                theme = lineSplit[lineSplit.index("templates")+2]
+                lineSplit = line.lower().split("/")
+                office = lineSplit[lineSplit.index("templates")+1].capitalize()
+                theme = lineSplit[lineSplit.index("templates")+2].capitalize()
                 key = lineSplit[-1]
 
                 if office not in listOfHooks.keys():
@@ -181,7 +181,12 @@ def integrate(fromFile: str, toFile: str) -> None:
                 break
 
     with open(fromFile, "r") as file:
-        with open(toFile, "w") as fileToWrite:
+        if index != 0:
+            fileMode = "w"
+        else:
+            fileMode = "a"
+        
+        with open(toFile, fileMode) as fileToWrite:
             fileToWrite.writelines(content[0:index])
             for line in file.readlines():
                 fileToWrite.write(line)

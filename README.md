@@ -1,6 +1,7 @@
 # Documentation Française
 
 Ce programme python permet de générer la documentation d'un projet Thelia à partir de ses fichiers sources.
+(Python 3.10+)
 
 ## Utilisation
 
@@ -10,20 +11,20 @@ python3 thelia-doc.py
 
 Le programme va ensuite vous demander quel documentation vous souhaitez générer.
 
-```
+```text
 > What would you like to do ([1] - help): <1 pour Help, 2 pour Hooks, 3 pour Events, 4 pour All>
 ```
 
 ## Hooks
 
 Quand vous choississez de générer la documentation des hooks le programme vous redemandera de choisir les actions que vous souhaitez faire.  
-
+Pour le bon fonctionnement du programme, il est nécessaire de lancer le programme à la racine du projet Thelia et que le répertoire 'templates' soit bien nommé 'templates'.
 
 ### Scan
 
 Le scan permet de scanner le reépertoire passé en ligne de commande pour trouver les hooks et les répertorier dans un fichier txt.
 
-```
+```text
 > Enter the directory to scan: <Le chemin de la racine de du projet à scanner>
 > Enter the file to write the hooks in [log.txt] :  <Le nom du fichier txt dans lequel écrire les hooks>
 ```
@@ -32,7 +33,7 @@ Le scan permet de scanner le reépertoire passé en ligne de commande pour trouv
 
 Le format permet de formater le fichier txt généré par le scan en fichier markdown.
 
-```
+```text
 > Enter the file to read the hooks from [log.txt] : <Le nom du fichier txt contenant les hooks>
 > Do you want to sort the hooks by key [Y/n] : <Si vous voulez trier les hooks>
 > Enter the file to write the hooks in [hooks.md] : <Le nom du fichier md dans lequel écrire les hooks>
@@ -42,7 +43,7 @@ Le format permet de formater le fichier txt généré par le scan en fichier mar
 
 L'integrate permet de prendre le fichier mardown généré par le format et de l'intégrer dans un fichier md donné en ligne de commande.
 
-```
+```text
 > Enter the file to read the hooks from [hooks.md] : <Le nom du fichier md contenant les hooks>
 > Enter the file to write the hooks in [documentation.md] : <Le nom du fichier md dans lequel écrire les hooks>
 ```
@@ -51,7 +52,7 @@ L'integrate permet de prendre le fichier mardown généré par le format et de l
 
 Permet de faire les trois actions en une seule commande.
 
-```
+```text
 > Enter the directory to scan: <Le chemin de la racine de du projet à scanner>
 > Enter the file to write the hooks in [log.txt] :  <Le nom du fichier txt dans lequel écrire les hooks>
 > Enter the file to write the hooks in [hooks.md] : <Le nom du fichier md dans lequel écrire les hooks>
@@ -101,21 +102,21 @@ Exemple:
 - Tri les catégories par ordre alphabétique.``
 - Convertit le fichier généré par eventPreAnalyser.sh en tableau python.
 - Fusionne les constantes avec les données de eventPreAnalyser.sh.
-- Génère un fichoer markdown mettant en page toutes ces données.
+- Génère un fichier markdown mettant en page toutes ces données.
 
 ### Utilisation de eventAnalyser.py
 
 Pour obtenir le résultat de l'analyse dans le fichier que vous voulez :  
 `python3 eventAnalyser.py [FICHIER SOURCE] [FICHIER DESTINATION]`
 
-Pour obtenir le résultat de l'analyse dans le fichier par défaut 'parsedEvents2.md' dans le même répertoire que eventAnalyser.sh :  
+Pour obtenir le résultat de l'analyse dans le fichier par défaut 'parsedEvents2.md' dans le même répertoire que eventAnalyser.py :  
 `python3 eventAnalyser.py [FICHIER SOURCE]`
 
 Le fichier source doit être le fichier TheliaEvents.php.  
 Vous devez inclure le chemin absolu dans le nom des fichiers.  
 Le fichier `dataArrayEvent.txt` généré par eventPreAnalyser.sh doit exister dans le repertoire courant.
 
-Les options `-h`et `--help` permettent d'accéder rapidement à cette description (en anglais uniquement). 
+Les options `-h`et `--help` permettent d'accéder rapidement à cette description (en anglais uniquement).  
 
 ### Comment commenter le fichier TheliaEvent.php pour l'analyseur d'événements
 
@@ -154,20 +155,20 @@ python3 thelia-doc.py
 
 The program will then ask you what documentation you want to generate.
 
-```
+```text
 > What would you like to do ([1] - help): <1 for Help, 2 for Hooks, 3 for Events, 4 for All>
 ```
 
 ## Hooks
 
-When you choose to generate hook documentation, the program will ask you again to select the actions you wish to take. 
-
+When you choose to generate hook documentation, the program will ask you again to select the actions you wish to take.  
+For the program to work properly, it is necessary to run the program at the root of the Thelia project and that the 'templates' directory is correctly named 'templates'.
 
 ### Scan
 
 The scan function scans the directory passed on the command line to find hooks and list them in a txt file.
 
-```
+```text
 > Enter the directory to scan: <The root path of the project to scan> 
 > Enter the file to write the hooks in [log.txt] : <The name of the txt file to write the hooks in>.
 ```
@@ -176,7 +177,7 @@ The scan function scans the directory passed on the command line to find hooks a
 
 Format allows you to format the txt file generated by the scan as a markdown file.
 
-```
+```text
 > Enter the file to read the hooks from [log.txt] : <The name of the txt file containing the hooks>
 > Do you want to sort the hooks by key [Y/n] : <If you want to sort the hooks>
 > Enter the file to write the hooks in [hooks.md] : <The name of the md file to write the hooks in>
@@ -186,7 +187,7 @@ Format allows you to format the txt file generated by the scan as a markdown fil
 
 Integrate takes the mardown file generated by the format and integrates it into a given md file on the command line.
 
-```
+```text
 > Enter the file to read the hooks from [hooks.md] : <The name of the md file containing the hooks>
 > Enter the file to write the hooks in [documentation.md] : <The name of the md file in which to write the hooks>
 ```
@@ -195,7 +196,7 @@ Integrate takes the mardown file generated by the format and integrates it into 
 
 Allows you to perform all three actions in a single command.
 
-```
+```text
 > Enter the directory to scan: <The root path of the project to scan>
 > Enter the file to write the hooks in [log.txt]: <The name of the txt file in which to write the hooks>
 > Enter the file to write the hooks in [documentation.md]: <The name of the md file in which to write the hooks>
@@ -246,14 +247,14 @@ Example:
 - Sort categories alphabetically.
 - Converts the file generated by eventPreAnalyser.sh into a python array.
 - Merges constants with eventPreAnalyser.sh data.
-- Generates a Markdown fichoer displaying all this data.
+- Generates a Markdown file displaying all this data.
 
 ### eventAnalyser.py usage
 
 To get the parsing result in the file you want :  
 `python3 eventAnalyser.py [SOURCE FILE] [DESTINATION FILE]`
 
-To get the parsing result in the default file 'parsedEvents.md' in the same repository as eventAnalyser.sh :  
+To get the parsing result in the default file 'parsedEvents.md' in the same repository as eventAnalyser.py :  
 `python3 eventAnalyser.py [SOURCE FILE]`
 
 The source file should be the TheliaEvents.php file.  
