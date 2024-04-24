@@ -11,11 +11,11 @@ def integrate(fromFile: str, toFile: str, matchChain: str = None) -> None:
         matchChain (str): The chain to match in the file to write in
     """
     if not os.path.exists(fromFile):
-        print("The file does not exist.")
+        print("The file to read in does not exist.")
         raise FileNotFoundError
 
     if not os.path.exists(toFile):
-        print("The file does not exist.")
+        print("The file to write in does not exist.")
         raise FileNotFoundError
 
     index = 0
