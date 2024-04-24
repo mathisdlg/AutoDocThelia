@@ -118,6 +118,21 @@ Pour identifier les classes dépréciées et le chemin d'accès de l'évènement
  */
 ```
 
+## All
+
+Permet de faire la documentation des hooks et des évènements en une seule commande et de nettoyer les fichiers temporaires générés.
+
+```text
+> Enter the path to the event directory: <Le chemin du répertoire des évènements dans thelia>
+> Enter the destination file path [parsedEvent2.md] : <Le chemin du fichier dans lequel écrire les évènements>
+> Enter the events documentation file to modify : <Le chemin du fichier de documentation des évènements>
+> Enter the directory to scan: <Le chemin de la racine de du projet à scanner>
+> Enter the file to write the hooks in [log.txt] :  <Le nom du fichier txt dans lequel écrire les hooks>
+> Enter the file to write the hooks in [hooks.md] : <Le nom du fichier md dans lequel écrire les hooks>
+> Enter the file to write the hooks in [documentation.md] : <Le nom du fichier md dans lequel écrire les hooks>
+> Do you want to sort the hooks by key [Y/n] : <Si vous voulez trier les hooks>
+```
+
 # English documentation
 
 This python program generates the documentation for a Thelia project from its source files.
@@ -236,4 +251,19 @@ To identify the deprecated classes and the access path of the event replacing th
 /*
  * @deprecated since X.Y, please use \Thelia\Model\Event\AnEventFile
  */
+```
+
+## All
+
+Allows you to do the documentation of hooks and events in a single command and clean up the temporary files generated.
+
+```text
+> Enter the path to the event directory: <The path to the events directory in Thelia>
+> Enter the destination file path [parsedEvent2.md] : <The path to the file to write the events in>
+> Enter the events documentation file to modify : <The path to the events documentation file>
+> Enter the directory to scan: <The root path of the project to scan>
+> Enter the file to write the hooks in [log.txt] : <The name of the txt file in which to write the hooks>
+> Enter the file to write the hooks in [hooks.md] : <The name of the md file in which to write the hooks>
+> Enter the file to write the hooks in [documentation.md] : <The name of the md file in which to write the hooks>
+> Do you want to sort the hooks by key [Y/n] : <If you want to sort the hooks>
 ```
