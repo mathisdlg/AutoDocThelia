@@ -79,7 +79,7 @@ Quand vous choisissez de générer la documentation des évènements, le program
 > Enter the events documentation file to modify : <Le chemin du fichier de documentation des évènements>
 ```
 
-### Redame des scripts d'analyse des évènements
+### Readme des scripts d'analyse des évènements
 
 [Détails ici](./README_events.md).
 
