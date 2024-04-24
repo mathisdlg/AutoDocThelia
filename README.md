@@ -81,16 +81,17 @@ Exemple de sortie:
 ### Utilisation de eventPreAnalyser.sh
 
 ```bash
-./eventPreAnalyzer.sh <chemin/vers/le/répertoire/événements> [nom_fichier_sortie.txt]
+./eventPreAnalyzer.sh [-r] <chemin/vers/le/répertoire/événements> [nom_fichier_sortie.txt]
 ```
 
+- [-r] (optionnel) : remplace le contenu du fichier de sortie portant le même nom s'il existe.
 - <chemin/vers/le/répertoire/événements> : Chemin vers le répertoire contenant les événements Thelia.
 - [nom_fichier_sortie.md] (optionnel) : Nom du fichier texte de sortie. S'il n'est pas fourni, le nom par défaut sera dataArrayEvent.txt sera utilisé.
 
 Exemple:
 
 ```bash
-./eventPreAnalyzer.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
+./eventPreAnalyzer.sh -r thelia/core/lib/Thelia/Core/Event liste_evenements.md
 ```
 
 ### Fonctionnalités de eventAnalyser.py
@@ -226,15 +227,16 @@ Example output:
 ### eventPreAnalyser.sh usage
 
 ```bash
-./eventPreAnalyzer.sh <path/to/events/directory> [output_file_name.txt]
+./eventPreAnalyzer.sh [-r] <path/to/events/directory> [output_file_name.txt]
 ```
 
+- [-r] (optional): replaces the contents of the output file with the same name if it exists.
 - <path/to/events/directory>: Path to the directory containing Thelia events.
 - [output_file_name.md] (optional): Name of the output text file. If not provided, the default name dataArrayEvent.txt will be used.  
 Example:
 
 ```bash
-./eventPreAnalyzer.sh thelia/core/lib/Thelia/Core/Event liste_evenements.md
+./eventPreAnalyzer.sh -r thelia/core/lib/Thelia/Core/Event liste_evenements.md
 ```
 
 ### eventAnalyser.py features
