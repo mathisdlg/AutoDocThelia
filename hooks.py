@@ -65,9 +65,9 @@ def get_from_logs(file: str) -> dict:
             line = line.strip()
             # if the line starts with a dot, it is a key
             if line.startswith("."):
-                lineSplit = line.split("/")
-                office = lineSplit[lineSplit.index("templates")+1]
-                theme = lineSplit[lineSplit.index("templates")+2]
+                lineSplit = line.lower().split("/")
+                office = lineSplit[lineSplit.index("templates")+1].capitalize()
+                theme = lineSplit[lineSplit.index("templates")+2].capitalize()
                 key = lineSplit[-1]
 
                 if office not in listOfHooks.keys():
