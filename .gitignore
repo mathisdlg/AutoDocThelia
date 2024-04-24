@@ -165,3 +165,7 @@ dataArrayEvent.txt
 log.txt
 hooks.md
 documentation.md
+
+
+#Mac
+.DS_Store
