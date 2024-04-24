@@ -1,5 +1,5 @@
 import re, sys, os
-
+from Common import integrate
 
 
 def get_hooks(directory: str, file: str) -> None:
@@ -156,41 +156,6 @@ def format_md_hooks(hookDict: dict, markdown: str) -> int:
                     md.write("\n</details>\n")
     return counter
 
-def integrate(fromFile: str, toFile: str) -> None:
-    """
-    This function integrate the formatted hooks in a specified markdown file
-
-    Args:
-        fromFile (str): The file to read the hooks from
-        toFile (str): The file to write the hooks in
-    """
-    if not os.path.exists(fromFile):
-        print("The file does not exist.")
-        raise FileNotFoundError
-
-    if not os.path.exists(toFile):
-        print("The file does not exist.")
-        raise FileNotFoundError
-
-    index = 0
-    with open(toFile, "r") as file:
-        content = file.readlines()
-        for line in content:
-            if "## Default hook list" in line:
-                index = content.index(line)
-                break
-
-    with open(fromFile, "r") as file:
-        if index != 0:
-            fileMode = "w"
-        else:
-            fileMode = "a"
-        
-        with open(toFile, fileMode) as fileToWrite:
-            fileToWrite.writelines(content[0:index])
-            for line in file.readlines():
-                fileToWrite.write(line)
-
 
 def all() -> None:
     directory = input("Enter the directory to scan: ")
@@ -231,7 +196,7 @@ def all() -> None:
         print("An error occured in get_from_logs.\n", e)
 
     try:
-        integrate(markdownFile, toFile)
+        integrate(markdownFile, toFile, "## Default hook list")
         print("Hooks successfully integrated.")
     except Exception as e:
         print("An error occured in integrate.\n", e)
@@ -331,7 +296,7 @@ def main() -> None:
                     toFile = "documentation.md"
 
                 try:
-                    integrate(file, toFile)
+                    integrate(file, toFile, "## Default hook list")
                     print("Hooks successfully integrated.")
                 except Exception as e:
                     print("An error occured.\n", e)
