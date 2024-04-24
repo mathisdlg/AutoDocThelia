@@ -181,7 +181,12 @@ def integrate(fromFile: str, toFile: str) -> None:
                 break
 
     with open(fromFile, "r") as file:
-        with open(toFile, "w") as fileToWrite:
+        if index != 0:
+            fileMode = "w"
+        else:
+            fileMode = "a"
+        
+        with open(toFile, fileMode) as fileToWrite:
             fileToWrite.writelines(content[0:index])
             for line in file.readlines():
                 fileToWrite.write(line)
