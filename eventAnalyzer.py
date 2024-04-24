@@ -13,17 +13,24 @@ def main(sourceFile, saveFile):
 
     header = True
     firstLines = True
+    # Global array to save all the events
+    # Global array in form : [["categoryName1", ["Comment", "CONSTANT"], ["CONSTANT"]], ["categoryName2", ["CONSTANT"], ["Comment", "Comment", "CONSTANT"]]]
+    # Category arrays here :  |------------------------------------------------------|  |-----------------------------------------------------------------|
+    # Constant arrays with it comment here :    |---------------------|  |----------|                     |----------|  |--------------------------------|
     arrayAllEvents = []
+    # To save a constant with it comments
     arrayConstants = []
     nbBracket = 0
 
 
     with open(sourceFile, "r") as file :
         for line in file.readlines() :
+            # While the "{" is not found, we are in the header
             if header :
                 if "{" in line :
                     header = False
                     nbBracket += 1
+            # The first category is a particular case
             elif firstLines :
                 if "//" in line and "end" not in line.lower() :
                     arrayEvent = []
@@ -43,8 +50,14 @@ def main(sourceFile, saveFile):
                         category = category[0:index]
                     arrayEvent.append(category.capitalize())
             else :
+                # If a category is found
+                # A category block is in the form '// -- Category ----------'
+                # We ignore the comments in the form '// -- End category ------'
+                # Case is ignored
                 if "//" in line and "end" not in line.lower() :
+                    # Add the last category array to the global one
                     arrayAllEvents.append(arrayEvent)
+                    # Array creation to save all the current category
                     arrayEvent = []
                     category = ""
                     isCategory = False
@@ -55,11 +68,14 @@ def main(sourceFile, saveFile):
                             isCategory = False
                         if isCategory :
                             category += letter.lower()
+                    # We remove the useless decorator like 'management' or 'events'
                     categorySplit = category.strip().lower().split(" ")
                     if categorySplit[-1] in ["management", "event", "events", "module", "modules"] and len(categorySplit) > 1:
                         index = category.find(categorySplit[-1])
                         category = category[0:index]
                     arrayEvent.append(category.capitalize())
+                # If a comment is found
+                # We ignore the lines with '/*' or '*/'
                 elif "* " in line and "/" not in line :
                     comment = ""
                     isComment = False
@@ -71,6 +87,7 @@ def main(sourceFile, saveFile):
                         if isComment :
                             comment += letter
                     arrayConstants.append(comment.strip())
+                # If a constant is found
                 elif "public const" in line :
                     constant = "**"+line.strip().split("public const ")[1].replace(";", "")
                     index = constant.find("=")-1
@@ -79,17 +96,23 @@ def main(sourceFile, saveFile):
                     arrayConstants.append(constant.strip())
                     arrayEvent.append(arrayConstants)
                     arrayConstants = []
+                # If a function is found
                 elif "function" in line :
+                    # Then we ignore any last comment found because there are not relative to constants
                     arrayConstants = []
+                # If an open bracket is found
                 elif "{" in line :
                     nbBracket += 1
+                # If a closed bracket is found
                 elif "}" in line :
                     nbBracket -= 1
+                    # If the bracket number <= 0, then we found the last closed bracket so the analyse is finished.
                     if nbBracket <= 0 :
                         arrayAllEvents.append(arrayEvent)
     arrayAllEvents.sort()
 
-    # Data fusion
+
+    # Convert str to array from the result file of eventPreAnalyser.sh
 
     arrayAllEventsSecondData = []
     firstChar = True
@@ -122,34 +145,43 @@ def main(sourceFile, saveFile):
                     elif not firstComma :
                         secondArgument += character
 
-    # Array exploitation to make a markdown file
+    # Arrays exploitation to make a markdown file
 
+    # An array to remember the no classified eventPreAnalyser data
     arrayNoCategory = list(arrayAllEventsSecondData)
 
     with open(saveFile, "w") as file :
         file.write("## Every event list\n\n")
+        # For every category
         for event in arrayAllEvents :
             file.write("### " + event[0] + "\n\n<details><summary>Detail</summary>\n\n")
             
+            # For every constant
             for iterator in range(1, len(event)) :
+                # For every comment of te constant
                 for element in event[iterator] :
                     file.write(element + "  \n")
                 file.write("\n")
             
             file.write("__________________\n\n")
             
+            # For every category of the eventPreAnalyser data
             for eventSecondData in arrayAllEventsSecondData :
+                # Try to match categories
                 if (eventSecondData[0] != "Nocategory") and (eventSecondData[0].lower().replace(" ", "") in event[0].lower().replace(" ", "") or eventSecondData[0].lower() in event[0].lower().replace(" ", "").replace("ies", "y") or eventSecondData[0].lower().replace("saleelement", "") in event[0].lower().replace(" ", "")) :
                     file.write(eventSecondData[1] + "\n\n")
+                    # If there is a match, then we remove the category from an array to only left the no classified eventPreAnalyser data
                     if eventSecondData in arrayNoCategory :
                         arrayNoCategory.remove(eventSecondData)
             file.write("</details>\n\n")
 
+        # We save the no classified eventPreAnalyser data
         file.write("### No classified" + "\n\n<details><summary>Detail</summary>\n\n")
         for event in arrayNoCategory :
             file.write("**" + event[0] + "** : \n" + event[1] + "\n\n")
         file.write("</details>\n\n")
     
+    # Integration of the modifications directly in thhe Thelia events documentation
     docFile = input("Enter the events documentation file to modify : ")
     integrate(saveFile, docFile, "Every event list")
 
