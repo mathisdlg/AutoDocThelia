@@ -150,7 +150,7 @@ def main(sourceFile, saveFile):
             file.write("**" + event[0] + "** : \n" + event[1] + "\n\n")
         file.write("</details>\n\n")
     
-    docFile = input("Enter the documentation file to modify : ")
+    docFile = input("Enter the events documentation file to modify : ")
     integrate(saveFile, docFile, "Every event list")
 
         
