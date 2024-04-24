@@ -1,7 +1,12 @@
 # Documentation Française
 
 Ce programme python permet de générer la documentation d'un projet Thelia à partir de ses fichiers sources.
-(Python 3.10+)
+
+## Prérequis
+
+- Python 3.10 ou supérieur
+- Un projet Thelia
+- Un shell bash
 
 ## Utilisation
 
@@ -116,6 +121,12 @@ Pour identifier les classes dépréciées et le chemin d'accès de l'évènement
 # English documentation
 
 This python program generates the documentation for a Thelia project from its source files.
+
+## Requirements
+
+- Python 3.10 or higher
+- A Thelia project
+- A bash shell
 
 ## Usage
 
