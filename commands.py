@@ -1,11 +1,27 @@
 from io import TextIOWrapper
 import os
 
+
+
 def printAndStop(things: any) -> None:
+    """Prints the things and stops the program
+
+    Args:
+        things (any): The things to print
+    """
     print(things)
     input("Press enter to continue")
 
-def getCommands(directory: str) -> dict:
+
+def getCommands(directory: str) -> dict[str: list[list[str, list[str]]]]:
+    """Get all the commands in the directory
+
+    Args:
+        directory (str): The directory to scan
+
+    Returns:
+        dict: The commands with the name as key and the config as value
+    """
     fileList = []
     listExtends = ["ContainerAwareCommand"]
 
@@ -34,16 +50,35 @@ def getCommands(directory: str) -> dict:
 
 
 def canBeACommand(path: str) -> int:
+    """Check if the file can be a command (if it extends something o not)
+
+    Args:
+        path (str): The path of the file
+
+    Returns:
+        int: The index of the extends or -1 if it does not extend anything
+    """
     with open(path, "r") as f:
         for line in f:
             line = line.strip()
             if (line.startswith("class") or line.startswith("abstract")):
                 indexExtends = line.find("extends")
                 return indexExtends
-    return False
+    return -1
 
 
-def getFileConfig(fileIndex: str, commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str]) -> int:
+def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str]) -> int:
+    """Get the config of the file
+
+    Args:
+        fileIndex (list[str]): the path of the file and the index of the extends
+        commands (dict): the commands dictionnary
+        fileList (list[str]): the list of all possible commands files
+        listExtends (list[str]): the list of the extends
+
+    Returns:
+        int: 0 if the command has been added, 1 if the extends has been added
+    """
     with open(fileIndex[0], "r") as f:
         isClass = False
         for line in f:
