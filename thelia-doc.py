@@ -1,5 +1,5 @@
 import sys, os
-import hooks, events, commands
+import Modules.hooks as hooks, Modules.events as events, Modules.commands as commands
 
 
 def help():
