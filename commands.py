@@ -176,7 +176,6 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                     elif letter == ")" :
                         
                         nbParenthesis -= 1
-                        print("(", nbFirstChar, ") :", contentName.strip())
                         if (nbParenthesis == 0) : 
                             
                             arrayContent.append(format(contentName.strip()))
