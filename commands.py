@@ -97,6 +97,14 @@ def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[
 
 
 def format(sequence: str) -> str :
+    """Format the sequence with the right format (remove the first and last character if they are " or ')
+
+    Args:
+        sequence (str): The sequence to format
+
+    Returns:
+        str: The formatted sequence
+    """
     if sequence[-1] in {"\'", "\""} and sequence[0] in {"\'", "\""} :
         sequence = sequence[:-1]
         sequence = sequence[1:]
@@ -104,6 +112,14 @@ def format(sequence: str) -> str :
 
 
 def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
+    """Analyse configure function in the file
+
+    Args:
+        file (TextIOWrapper): The file to analyse
+
+    Returns:
+        tuple[str, list[list[str, list[str]]]]: The name of the command and the config
+    """
 
     # list structure
     # arrayAllConfig : [["setDescription", ["This command do this"]], ["addOption", ["option1", "option2"]]]
@@ -242,7 +258,15 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
 
 
 
-def format_title(title):
+def format_title(title: str) -> str:
+    """Formats the title to ensure it starts with '## ' and includes only the first uppercase letters
+
+    Args:
+        title (str): The title to format
+
+    Returns:
+        str: The formatted title
+    """
     # formats the title to ensure it starts with '## ' and includes only the first uppercase letters
     formatted_title = "## "
     found_upper = False
@@ -258,8 +282,15 @@ def format_title(title):
     return formatted_title + "\n\n" 
 
 
-def format_option(option):
-    # formats the option by filtering out 'null' and 'InputOption' parameters
+def format_option(option: list[str]) -> str:
+    """Formats the option by filtering out 'null' and 'InputOption' parameters
+
+    Args:
+        option (list[str]): The option to format
+
+    Returns:
+        str: The formatted option
+    """
     first_param = option[0]
     if isinstance(first_param, list):
         first_param = ' '.join(first_param)
@@ -271,8 +302,15 @@ def format_option(option):
     return ' '.join(filtered_option)
 
 
-def format_argument(argument):
-    # formats the argument by filtering out 'null' and 'InputArgument' parameters
+def format_argument(argument: list[str]) -> str:
+    """Formats the argument by filtering out 'null' and 'InputArgument' parameters
+
+    Args:
+        argument (list[str]): The argument to format
+
+    Returns:
+        str: The formatted argument
+    """
     first_param = argument[0]
     if isinstance(first_param, list):
         first_param = ' '.join(first_param)
@@ -284,7 +322,17 @@ def format_argument(argument):
     return ' '.join(filtered_argument)
 
 
-def create_markdown_from_dict(data_dict, path="output"):
+def create_markdown_from_dict(data_dict: dict[str: str|list[list[str, list[str]]]], path: str="output") -> str:
+    """Creates markdown file(s) from the dictionary
+
+    Args:
+        data_dict (dict): the dictionary containing the command names and their respective configurations
+        path (str, optional): The path to save the markdown file(s). Defaults to "output".
+
+    Returns:
+        str: The message indicating the markdown file(s) was/were created successfully
+    """
+
     for name, items in data_dict.items():
         formatted_str = ""
         has_option = False
@@ -355,7 +403,9 @@ def create_markdown_from_dict(data_dict, path="output"):
 
 
 
-def main():
+def main() -> None:
+    """Main function to get the directory and output directory and create the markdown file(s) from the commands in the directory
+    """
     directory = input("Enter the directory to scan commands: ")
     output = input("Enter the output directory for commands [./ouput/]: ")
     if output == "":
