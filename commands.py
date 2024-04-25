@@ -1,31 +1,76 @@
 from io import TextIOWrapper
 import os
 
-def get_commands(directory: str, listExtends: list[str] = ["ContainerAwareCommand"]) -> dict:
+def getCommands(directory: str) -> dict:
+    fileList = []
+    listExtends = ["ContainerAwareCommand"]
+
+    commandAddedOrExtendsAdded = True
+
     commands = {}
+
     for root, dirs, files in os.walk(directory):
         for file in files:
             path = os.path.join(root, file)
             if path.endswith(".php") and not "vendor" in path:
-                with open(path, "r") as f:
-                    for line in f:
-                        line = line.strip()
-                        if (line.startswith("class") or line.startswith("abstract")):
-                            index = line.find("extends")
-                            if index != -1:
-                                extends = line[index + len("extends"):] if not line.endswith("{") else line[index + len("extends"):line.index("{")].strip()
-                                if line.startswith("class") and extends in listExtends:
-                                    name, config = getConfig(f)
-                                    commands[name] = config
-                                elif line.startswith("abstract") and extends in listExtends:
-                                    listExtends.append(line[line.index("abstract class ") + len("abstract class "):index].strip())
+                if canBeACommand(path):
+                    fileList.append(path)
+
+    while commandAddedOrExtendsAdded:
+        commandAddedOrExtendsAdded = False
+        for file in fileList:
+            print(file)
+            match getFileConfig(file, commands, fileList, listExtends):
+                case 0:
+                    print("Command found")
+                    commandAddedOrExtendsAdded = True
+                case 1:
+                    print("New extends found")
+                    commandAddedOrExtendsAdded = True
+                case 2:
+                    print("Command not found but can be a command")
+                case 3:
+                    print("Not a command at all")
+
     return commands
 
-def scan_file(fileName: str, listExtends: list[str]) -> dict:
-    ...          
+
+def canBeACommand(path: str) -> bool:
+    with open(path, "r") as f:
+        for line in f:
+            line = line.strip()
+            if (line.startswith("class") or line.startswith("abstract")):
+                indexExtends = line.find("extends")
+                return indexExtends != -1
+    return False
+
+
+def getFileConfig(path: str, commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str]) -> int:
+    with open(path, "r") as f:
+        isClass = False
+        for line in f:
+            line = line.strip()
+            if (line.startswith("class") or line.startswith("abstract")):
+                indexExtends = line.find("extends")
+                if indexExtends != -1:
+                    extends = line[indexExtends + len("extends"):] if not line.endswith("{") else line[indexExtends + len("extends"):line.index("{")].strip()
+                    if extends in listExtends:
+                        if line.startswith("class"):
+                            isClass = True
+                            name, config = getConfig(f)
+                            commands[name] = config
+                        listExtends.append(line[line.index("class ") + len("class "):indexExtends].strip())
+                        return 0 if isClass else 1
+                    else:
+                        fileList.append(path)
+                        return 2
+    return 3
 
 
 def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
+    #dict[name] = [["setDescription", ["...
+    #tuple_data = ("Name", [["setDescription", ["This command do this"]], ["addOption", ["nameOption1", "null", "InputOption::VALUE_REQUIRED", "blabla_opt2"]], ["addOption", ["option2", "InputOption::VALUE_REQUIRED", "blabla_opt4"]], ["addArgument", ["argument1", "InputArgument::OPTIONAL", "description1"]], ["addArgument", ["argument2", "InputArgument::OPTIONAL", "description2"]]])
+
     # (Name,[["setDescription", ["This command do this"]], ["addOption", ["option1", "option2"]], ["addArgument", ["argument1", "argument2"]]])  : arrayAllConfig
     #        |------------------------------------------|  |-----------------------------------|   : arrayConfig
     #                           |----------------------|                 |--------------------|    : arrayContent
@@ -58,6 +103,7 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
 
             if "->" in line and nbParentesis == 0 :
                 listElements = line.split("->")
+                print("test")
                 for iterator in range(1, len(listElements)) :
                     isConfigName = True
                     isContent = False
@@ -70,6 +116,7 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                                 arrayContent.append(contentName)
                                 contentName = ""
                                 arrayConfig.append(arrayContent)
+                                arrayAllConfig.append(arrayConfig)
                                 isReturnLine = False
                             elif letter != "\n" :
                                 contentName += letter
@@ -86,11 +133,16 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                 for letter in line :
                     if letter == "," :
                         arrayContent.append(contentName)
+                        contentName = ""
                     elif letter == ")" :
+                        arrayContent.append(contentName)
+                        contentName = ""
                         arrayConfig.append(arrayContent)
+                        arrayAllConfig.append(arrayConfig)
                         isReturnLine = False
-                    else :
+                    elif letter != "\n" :
                         contentName += letter
+                    
 
 
            
@@ -98,7 +150,8 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
             # End of configure function
             if "}" in line :
                 break
-            ...
+
+    return arrayAllConfig
 
             #     
             #         
@@ -108,8 +161,9 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
             #         result += letter
             #     elif letter == "(" :
             #         isConfigName = True
+            
     
-
+print(getConfig(open("/Users/mdelage/Sites/thelia/core/lib/Thelia/Command/ModuleActivateCommand.php")))
 
 
 
