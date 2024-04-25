@@ -259,26 +259,26 @@ def format_title(title):
 
 
 def format_option(option):
-    # formats the option by filtering out 'null' and '::' parameters
+    # formats the option by filtering out 'null' and 'InputOption' parameters
     first_param = option[0]
     if isinstance(first_param, list):
         first_param = ' '.join(first_param)
-    if '::' in first_param:
+    if 'InputOption' in first_param:
         return ' '.join(option)
-    filtered_option = [param for param in option[1:] if 'null' not in param and '::' not in param]
+    filtered_option = [param for param in option[1:] if 'null' not in param and 'InputOption' not in param]
     if not filtered_option:
         return ''
     return ' '.join(filtered_option)
 
 
 def format_argument(argument):
-    # formats the argument by filtering out 'null' and '::' parameters
+    # formats the argument by filtering out 'null' and 'InputArgument' parameters
     first_param = argument[0]
     if isinstance(first_param, list):
         first_param = ' '.join(first_param)
-    if '::' in first_param:
+    if 'InputArgument' in first_param:
         return ' '.join(argument)
-    filtered_argument = [param for param in argument[1:] if 'null' not in param and '::' not in param]
+    filtered_argument = [param for param in argument[1:] if 'null' not in param and 'InputArgument' not in param]
     if not filtered_argument:
         return ''
     return ' '.join(filtered_argument)
@@ -314,13 +314,13 @@ def create_markdown_from_dict(data_dict, path="output"):
                 option_title = 'Option'
                 if prev_title != option_title:
                     option_and_desc += f"## {option_title}\n\n" 
-                option_and_desc += f"- `{item[1][0]}` {format_option(item[1])}\n\n"  # Added '- ' before each option
+                option_and_desc += f"- `{item[1][0]}` {format_option(item[1])}\n\n"
                 prev_title = option_title
             elif item[0].startswith('addArgument'):
                 argument_title = 'Argument'
                 if prev_title != argument_title:
                     option_and_desc += f"## {argument_title}\n\n"
-                option_and_desc += f"- `{item[1][0]}` {format_argument(item[1])}\n\n"  # Added '- ' before each argument
+                option_and_desc += f"- `{item[1][0]}` {format_argument(item[1])}\n\n"
                 prev_title = argument_title
                 arguments.append(item[1][0])
 
@@ -349,7 +349,7 @@ def create_markdown_from_dict(data_dict, path="output"):
             os.makedirs(path)
 
         with open(filename, 'w') as f:
-            f.write(formatted_str.rstrip() + "\n")  # Add single newline after rstrip()
+            f.write(formatted_str.rstrip() + "\n")
 
     return f"Markdown file(s) was/were created successfully ✅"
 
