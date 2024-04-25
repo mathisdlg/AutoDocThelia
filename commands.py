@@ -284,7 +284,7 @@ def format_argument(argument):
     return ' '.join(filtered_argument)
 
 
-def create_markdown_from_dict(data_dict):
+def create_markdown_from_dict(data_dict, path="output"):
     for name, items in data_dict.items():
         formatted_str = ""
         has_option = False
@@ -342,6 +342,12 @@ def create_markdown_from_dict(data_dict):
         bash_code = f"php Thelia {name} ..." 
         formatted_str += "## Example\n\n" + f"```bash\n{bash_code}\n```\n\n"
         filename = name.replace(':','_') + ".md"
+
+        if path:
+            filename = os.path.join(path, filename)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
         with open(filename, 'w') as f:
             f.write(formatted_str.rstrip() + "\n")  # Add single newline after rstrip()
 
