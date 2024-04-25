@@ -1,6 +1,10 @@
 from io import TextIOWrapper
 import os
 
+def printAndStop(things: any) -> None:
+    print(things)
+    input("Press enter to continue")
+
 def getCommands(directory: str) -> dict:
     fileList = []
     listExtends = ["ContainerAwareCommand"]
@@ -13,58 +17,48 @@ def getCommands(directory: str) -> dict:
         for file in files:
             path = os.path.join(root, file)
             if path.endswith(".php") and not "vendor" in path:
-                if canBeACommand(path):
-                    fileList.append(path)
+                index = canBeACommand(path)
+                if index > 0:
+                    fileList.append([path, index])
 
     while commandAddedOrExtendsAdded:
         commandAddedOrExtendsAdded = False
-        for file in fileList:
-            print(file)
-            match getFileConfig(file, commands, fileList, listExtends):
+        for fileIndex in fileList:
+            match getFileConfig(fileIndex, commands, fileList, listExtends):
                 case 0:
-                    print("Command found")
                     commandAddedOrExtendsAdded = True
                 case 1:
-                    print("New extends found")
                     commandAddedOrExtendsAdded = True
-                case 2:
-                    print("Command not found but can be a command")
-                case 3:
-                    print("Not a command at all")
 
     return commands
 
 
-def canBeACommand(path: str) -> bool:
+def canBeACommand(path: str) -> int:
     with open(path, "r") as f:
         for line in f:
             line = line.strip()
             if (line.startswith("class") or line.startswith("abstract")):
                 indexExtends = line.find("extends")
-                return indexExtends != -1
+                return indexExtends
     return False
 
 
-def getFileConfig(path: str, commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str]) -> int:
-    with open(path, "r") as f:
+def getFileConfig(fileIndex: str, commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str]) -> int:
+    with open(fileIndex[0], "r") as f:
         isClass = False
         for line in f:
             line = line.strip()
             if (line.startswith("class") or line.startswith("abstract")):
-                indexExtends = line.find("extends")
-                if indexExtends != -1:
-                    extends = line[indexExtends + len("extends"):] if not line.endswith("{") else line[indexExtends + len("extends"):line.index("{")].strip()
-                    if extends in listExtends:
-                        if line.startswith("class"):
-                            isClass = True
-                            name, config = getConfig(f)
-                            commands[name] = config
-                        listExtends.append(line[line.index("class ") + len("class "):indexExtends].strip())
-                        return 0 if isClass else 1
-                    else:
-                        fileList.append(path)
-                        return 2
-    return 3
+                indexExtends = fileIndex[1]
+                extends = (line[indexExtends + len("extends"):] if not line.endswith("{") else line[indexExtends + len("extends"):line.index("{")]).strip()
+                if extends in listExtends:
+                    if line.startswith("class"):
+                        isClass = True
+                        name, config = fileIndex[0], fileIndex[1] #getConfig(f)
+                        commands[name] = config
+                    listExtends.append(line[line.index("class ") + len("class "):indexExtends].strip())
+                    fileList.remove(fileIndex)
+                    return 0 if isClass else 1
 
 
 def format(sequence: str) -> str :
@@ -179,7 +173,7 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
 
 
 
-
 if __name__ == "__main__":
-    # print(get_commands(input("Enter the directory to scan: ")))
+    # print(getConfig(open("/Users/mdelage/Sites/thelia/core/lib/Thelia/Command/ModuleActivateCommand.php")))
+    print(len(getCommands(input("Enter the directory to scan: ")).keys()))
     ...
