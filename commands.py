@@ -127,7 +127,7 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                                 nbFirstChar -= 1
                             if letter == "(" :
                                 nbParenthesis += 1
-                            if letter == "," and nbFirstChar == 0 :
+                            if letter == "," and nbFirstChar == 0 and nbParenthesis < 2 :
                                 arrayContent.append(format(contentName.strip()))
                                 contentName = ""
                                 isFirstChar = True
@@ -169,7 +169,7 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                             isFirstChar = True
                     if letter == "(" :
                         nbParenthesis += 1
-                    if letter == "," and nbFirstChar == 0 :
+                    if letter == "," and nbFirstChar == 0 and nbParenthesis < 2 :
                         arrayContent.append(format(contentName.strip()))
                         contentName = ""
                         isFirstChar = True
