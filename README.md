@@ -118,7 +118,7 @@ Pour identifier les classes dépréciées et le chemin d'accès de l'évènement
  */
 ```
 
-## Commands
+## Commandes
 
 Quand vous choisissez de générer la documentation des commandes, le programme vous demandera de remplir des champs pour générer la documentation.
 
@@ -126,6 +126,10 @@ Quand vous choisissez de générer la documentation des commandes, le programme 
 > Enter the directory to scan commands: <La racine du projet Thelia>
 > Enter the output directory for commands [./ouput/]: <Le répertoire de sortie pour les commandes>
 ```
+
+### Readme du script des commandes
+
+[Détails ici](./README_commands.md).
 
 ## All
 
@@ -272,6 +276,10 @@ When you choose to generate command documentation, the program will ask you to f
 > Enter the directory to scan commands: <The root path of the project to scan>
 > Enter the output directory for commands [./ouput/]: <The output directory for commands>
 ```
+
+### Readme of the command script
+
+[Details here](./README_commands.md).
 
 ## All
 
