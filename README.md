@@ -17,7 +17,7 @@ python3 thelia-doc.py
 Le programme va ensuite vous demander quel documentation vous souhaitez générer.
 
 ```text
-> What would you like to do ([1] - help): <1 pour Help, 2 pour Hooks, 3 pour Events, 4 pour All>
+> What would you like to do ([1] - help): <1 pour Help, 2 pour Hooks, 3 pour Events, 4 pour Commands, 9 pour All>
 ```
 
 ## Hooks
@@ -55,7 +55,7 @@ L'integrate permet de prendre le fichier mardown généré par le format et de l
 
 ### All
 
-Permet de faire les trois actions en une seule commande.
+Permet de faire toutes actions en une seule commande.
 
 ```text
 > Enter the directory to scan: <Le chemin de la racine de du projet à scanner>
@@ -118,6 +118,15 @@ Pour identifier les classes dépréciées et le chemin d'accès de l'évènement
  */
 ```
 
+## Commands
+
+Quand vous choisissez de générer la documentation des commandes, le programme vous demandera de remplir des champs pour générer la documentation.
+
+```text
+> Enter the directory to scan commands: <La racine du projet Thelia>
+> Enter the output directory for commands [./ouput/]: <Le répertoire de sortie pour les commandes>
+```
+
 ## All
 
 Permet de faire la documentation des hooks et des évènements en une seule commande et de nettoyer les fichiers temporaires générés.
@@ -131,6 +140,8 @@ Permet de faire la documentation des hooks et des évènements en une seule comm
 > Enter the file to write the hooks in [hooks.md] : <Le nom du fichier md dans lequel écrire les hooks>
 > Enter the file to write the hooks in [documentation.md] : <Le nom du fichier md dans lequel écrire les hooks>
 > Do you want to sort the hooks by key [Y/n] : <Si vous voulez trier les hooks>
+> Enter the directory to scan: <Le chemin de la racine de du projet à scanner>
+> Enter the output directory for commands [./ouput/]: <Le chemin du répertoire de sortie pour les commandes>
 ```
 
 # English documentation
@@ -152,7 +163,7 @@ python3 thelia-doc.py
 The program will then ask you what documentation you want to generate.
 
 ```text
-> What would you like to do ([1] - help): <1 for Help, 2 for Hooks, 3 for Events, 4 for All>
+> What would you like to do ([1] - help): <1 for Help, 2 for Hooks, 3 for Events, 4 for Commands, 9 for All>
 ```
 
 ## Hooks
@@ -253,6 +264,15 @@ To identify the deprecated classes and the access path of the event replacing th
  */
 ```
 
+## Commands
+
+When you choose to generate command documentation, the program will ask you to fill in fields to generate the documentation.
+
+```text
+> Enter the directory to scan commands: <The root path of the project to scan>
+> Enter the output directory for commands [./ouput/]: <The output directory for commands>
+```
+
 ## All
 
 Allows you to do the documentation of hooks and events in a single command and clean up the temporary files generated.
@@ -266,4 +286,6 @@ Allows you to do the documentation of hooks and events in a single command and c
 > Enter the file to write the hooks in [hooks.md] : <The name of the md file in which to write the hooks>
 > Enter the file to write the hooks in [documentation.md] : <The name of the md file in which to write the hooks>
 > Do you want to sort the hooks by key [Y/n] : <If you want to sort the hooks>
+> Enter the directory to scan commands: <The root path of the project to scan>
+> Enter the output directory for commands [./ouput/]: <The output directory for commands>
 ```
