@@ -1,5 +1,5 @@
 import sys, os
-import hooks, events
+import hooks, events, commands
 
 
 def help():
@@ -7,7 +7,8 @@ def help():
     print("[1] - help: Display this help message")
     print("[2] - go to hooks documentation manager")
     print("[3] - generate events documentation")
-    print("[4] - generate events and hooks documentation")
+    print("[4] - generate commands documentation")
+    print("[9] - generate events and hooks documentation")
     print("")
     print("[0] - exit: Exit the program\n")
 
@@ -29,9 +30,12 @@ if __name__ == '__main__':
             case '3':
                 events.main()
             case '4':
+                commands.main()
+            case '9':
                 events.main()
                 hooks.all()
                 hooks.clean()
+                commands.main()
             case _:
                 print("Invalid choice. Please try again.\n")
                 continue
