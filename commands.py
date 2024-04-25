@@ -67,6 +67,13 @@ def getFileConfig(path: str, commands: dict[str: list[list[str, list[str]]]], fi
     return 3
 
 
+def format(sequence: str) -> str :
+    if sequence[-1] in {"\'", "\""} and sequence[0] in {"\'", "\""} :
+        sequence = sequence[:-1]
+        sequence = sequence[1:]
+    return sequence
+
+
 def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
     #dict[name] = [["setDescription", ["...
     #tuple_data = ("Name", [["setDescription", ["This command do this"]], ["addOption", ["nameOption1", "null", "InputOption::VALUE_REQUIRED", "blabla_opt2"]], ["addOption", ["option2", "InputOption::VALUE_REQUIRED", "blabla_opt4"]], ["addArgument", ["argument1", "InputArgument::OPTIONAL", "description1"]], ["addArgument", ["argument2", "InputArgument::OPTIONAL", "description2"]]])
@@ -80,11 +87,8 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
     header = True
     isConfigName = False
     isContent = False
-    isArrow = False
-    isNewConfig = False
     nbParentesis = 0
     isReturnLine = False
-    name = ""
     configName = ""
     contentName = ""
 
@@ -94,33 +98,36 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                 # Begin of configure function
                 header = False
         else:
-            
-            #parentesisCounter = line.count("(")
-            #if parentesisCounter > 0:
-            #    if parentesisCounter - line.count(")") == 1: # $this->setName("hello:world") without "->setDescription("output hello world");
-
-            #    if parentesisCounter - line.count(")") == 0: # $this->setName("hello:world")->setDescription("output hello world");
 
             if "->" in line and nbParentesis == 0 :
                 listElements = line.split("->")
-                print("test")
+                
                 for iterator in range(1, len(listElements)) :
                     isConfigName = True
                     isContent = False
                     for letter in listElements[iterator] :
                         if isContent :
+                            if letter == "(" :
+                                nbParentesis += 1
                             if letter == "," :
-                                arrayContent.append(contentName)
+                                arrayContent.append(format(contentName.strip()))
                                 contentName = ""
                             elif letter == ")" :
-                                arrayContent.append(contentName)
-                                contentName = ""
-                                arrayConfig.append(arrayContent)
-                                arrayAllConfig.append(arrayConfig)
-                                isReturnLine = False
+                                nbParentesis -= 1
+                                if (nbParentesis == 0) :    
+                                    arrayContent.append(format(contentName.strip()))
+                                    contentName = ""
+                                    arrayConfig.append(arrayContent)
+                                    arrayContent = []
+                                    arrayAllConfig.append(arrayConfig)
+                                    arrayConfig = []
+                                    isReturnLine = False
+                                else :
+                                    contentName += letter
                             elif letter != "\n" :
                                 contentName += letter
                         elif letter == "(" :
+                            nbParentesis += 1
                             isConfigName = False
                             isContent = True
                             arrayConfig.append(configName)
@@ -128,44 +135,47 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                             isReturnLine = True
                         elif isConfigName :
                             configName += letter
+                        
             if "->" not in line and isReturnLine :
-                contentName = ""
                 for letter in line :
+                    if letter == "(" :
+                        nbParentesis += 1
                     if letter == "," :
-                        arrayContent.append(contentName)
+                        arrayContent.append(format(contentName.strip()))
                         contentName = ""
                     elif letter == ")" :
-                        arrayContent.append(contentName)
-                        contentName = ""
-                        arrayConfig.append(arrayContent)
-                        arrayAllConfig.append(arrayConfig)
-                        isReturnLine = False
+                        
+                        nbParentesis -= 1
+                        if (nbParentesis == 0) : 
+                            arrayContent.append(format(contentName.strip()))
+                            contentName = ""
+                            arrayConfig.append(arrayContent)
+                            arrayContent = []
+                            arrayAllConfig.append(arrayConfig)
+                            arrayConfig = []
+                            isReturnLine = False
+                        else :
+                            contentName += letter
+                            
                     elif letter != "\n" :
                         contentName += letter
-                    
 
 
-           
-                    ...
             # End of configure function
             if "}" in line :
+                for config in arrayAllConfig :
+                    if config[0] == "setDescription" :
+                        config[1] = " ".join(config[1])
+                        break
                 break
 
-    return arrayAllConfig
-
-            #     
-            #         
-            #         
-                    
-            #     if isConfigName :
-            #         result += letter
-            #     elif letter == "(" :
-            #         isConfigName = True
-            
-    
-print(getConfig(open("/Users/mdelage/Sites/thelia/core/lib/Thelia/Command/ModuleActivateCommand.php")))
-
-
+    name = "No name :("
+    for iterator in range(len(arrayAllConfig)) :
+        if arrayAllConfig[iterator][0] == "setName" :
+            name = arrayAllConfig[iterator][1][0]
+            arrayAllConfig.pop(iterator)
+            break
+    return name, arrayAllConfig
 
 
 
