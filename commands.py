@@ -205,4 +205,4 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
 
 
 if __name__ == "__main__":
-    print(getCommands(input("Enter the directory to scan: ")))
+    dictionnary = getCommands(input("Enter the directory to scan: "))
