@@ -54,7 +54,7 @@ def getFileConfig(fileIndex: str, commands: dict[str: list[list[str, list[str]]]
                 if extends in listExtends:
                     if line.startswith("class"):
                         isClass = True
-                        name, config = fileIndex[0], fileIndex[1] #getConfig(f)
+                        name, config = getConfig(f)
                         commands[name] = config
                     listExtends.append(line[line.index("class ") + len("class "):indexExtends].strip())
                     fileList.remove(fileIndex)
@@ -69,20 +69,37 @@ def format(sequence: str) -> str :
 
 
 def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
-    #dict[name] = [["setDescription", ["...
-    #tuple_data = ("Name", [["setDescription", ["This command do this"]], ["addOption", ["nameOption1", "null", "InputOption::VALUE_REQUIRED", "blabla_opt2"]], ["addOption", ["option2", "InputOption::VALUE_REQUIRED", "blabla_opt4"]], ["addArgument", ["argument1", "InputArgument::OPTIONAL", "description1"]], ["addArgument", ["argument2", "InputArgument::OPTIONAL", "description2"]]])
 
-    # (Name,[["setDescription", ["This command do this"]], ["addOption", ["option1", "option2"]], ["addArgument", ["argument1", "argument2"]]])  : arrayAllConfig
-    #        |------------------------------------------|  |-----------------------------------|   : arrayConfig
-    #                           |----------------------|                 |--------------------|    : arrayContent
+    # list structure
+    # arrayAllConfig : [["setDescription", ["This command do this"]], ["addOption", ["option1", "option2"]]]
+    # arrayConfig :     |------------------------------------------|  |-----------------------------------|
+    # arrayContent :                       |----------------------|                 |--------------------|
     arrayAllConfig = []
     arrayConfig = []
     arrayContent = []
+    
+    # Define if we are in a header line or not
     header = True
+    
+    # Define if the letter we analyse is part of the config name (examples : "setDescription", "addOption", ...)
     isConfigName = False
+    
+    # Define if the letter we analyse is part of the content
     isContent = False
-    nbParentesis = 0
+    
+    # Count the number of parents. If this number > 0, a parenthesis is open while the previous one has not yet been closed.
+    nbParenthesis = 0
+    
+    # Define if the line we are analyzing is part of the previous one
     isReturnLine = False
+    
+    # Define if the letter we are analyzing is the first one of the current content
+    isFirstChar = True
+    # Define if the first char is a " or a '
+    firstChar = ""
+    # Count the number of first characters. If this number > 0, then the string is not closed and commas should not be treated as field separators.
+    nbFirstChar = 0
+    
     configName = ""
     contentName = ""
 
@@ -93,24 +110,33 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                 header = False
         else:
 
-            if "->" in line and nbParentesis == 0 :
+            if "->" in line and nbParenthesis == 0 :
                 listElements = line.split("->")
                 
                 for iterator in range(1, len(listElements)) :
                     isConfigName = True
                     isContent = False
+                    isFirstChar = True
                     for letter in listElements[iterator] :
                         if isContent :
+                            if isFirstChar and (letter == "\"" or letter == "\'") :
+                                isFirstChar = False
+                                firstChar = letter
+                                nbFirstChar += 1
+                            elif not isFirstChar and letter == firstChar :
+                                nbFirstChar -= 1
                             if letter == "(" :
-                                nbParentesis += 1
-                            if letter == "," :
+                                nbParenthesis += 1
+                            if letter == "," and nbFirstChar == 0 :
                                 arrayContent.append(format(contentName.strip()))
                                 contentName = ""
+                                isFirstChar = True
                             elif letter == ")" :
-                                nbParentesis -= 1
-                                if (nbParentesis == 0) :    
+                                nbParenthesis -= 1
+                                if (nbParenthesis == 0) :    
                                     arrayContent.append(format(contentName.strip()))
                                     contentName = ""
+                                    isFirstChar = True
                                     arrayConfig.append(arrayContent)
                                     arrayContent = []
                                     arrayAllConfig.append(arrayConfig)
@@ -121,7 +147,7 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                             elif letter != "\n" :
                                 contentName += letter
                         elif letter == "(" :
-                            nbParentesis += 1
+                            nbParenthesis += 1
                             isConfigName = False
                             isContent = True
                             arrayConfig.append(configName)
@@ -131,18 +157,27 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
                             configName += letter
                         
             if "->" not in line and isReturnLine :
+                isFirstChar = True
                 for letter in line :
+                    if isFirstChar and (letter == "\"" or letter == "\'") :
+                        isFirstChar = False
+                        firstChar = letter
+                        nbFirstChar += 1
+                    elif not isFirstChar and letter == firstChar :
+                        nbFirstChar -= 1
                     if letter == "(" :
-                        nbParentesis += 1
-                    if letter == "," :
+                        nbParenthesis += 1
+                    if letter == "," and nbFirstChar == 0 :
                         arrayContent.append(format(contentName.strip()))
                         contentName = ""
+                        isFirstChar = True
                     elif letter == ")" :
                         
-                        nbParentesis -= 1
-                        if (nbParentesis == 0) : 
+                        nbParenthesis -= 1
+                        if (nbParenthesis == 0) : 
                             arrayContent.append(format(contentName.strip()))
                             contentName = ""
+                            isFirstChar = True
                             arrayConfig.append(arrayContent)
                             arrayContent = []
                             arrayAllConfig.append(arrayConfig)
@@ -157,10 +192,6 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
 
             # End of configure function
             if "}" in line :
-                for config in arrayAllConfig :
-                    if config[0] == "setDescription" :
-                        config[1] = " ".join(config[1])
-                        break
                 break
 
     name = "No name :("
@@ -174,6 +205,4 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
 
 
 if __name__ == "__main__":
-    # print(getConfig(open("/Users/mdelage/Sites/thelia/core/lib/Thelia/Command/ModuleActivateCommand.php")))
-    print(len(getCommands(input("Enter the directory to scan: ")).keys()))
-    ...
+    print(getCommands(input("Enter the directory to scan: "))["currency:update-rates"])
