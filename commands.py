@@ -204,5 +204,113 @@ def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
 
 
 
+def format_title(title):
+    # formats the title to ensure it starts with '## ' and includes only the first uppercase letters
+    formatted_title = "## "
+    found_upper = False
+    used_words = set()
+    for char in title:
+        if char.isupper():
+            found_upper = True
+            formatted_title += char
+        elif found_upper:
+            if char.isalpha() and char.lower() not in used_words:
+                used_words.add(char.lower())
+                formatted_title += char
+    return formatted_title + "\n\n" 
+
+
+def format_option(option):
+    # formats the option by filtering out 'null' and '::' parameters
+    first_param = option[0]
+    if isinstance(first_param, list):
+        first_param = ' '.join(first_param)
+    if '::' in first_param:
+        return ' '.join(option)
+    filtered_option = [param for param in option[1:] if 'null' not in param and '::' not in param]
+    if not filtered_option:
+        return ''
+    return ' '.join(filtered_option)
+
+
+def format_argument(argument):
+    # formats the argument by filtering out 'null' and '::' parameters
+    first_param = argument[0]
+    if isinstance(first_param, list):
+        first_param = ' '.join(first_param)
+    if '::' in first_param:
+        return ' '.join(argument)
+    filtered_argument = [param for param in argument[1:] if 'null' not in param and '::' not in param]
+    if not filtered_argument:
+        return ''
+    return ' '.join(filtered_argument)
+
+
+def create_markdown_from_dict(data_dict):
+    for name, items in data_dict.items():
+        formatted_str = ""
+        has_option = False
+        arguments = []
+        prev_title = None 
+
+        # Title1 section
+        formatted_str += f"# {name.lower()}\n\n"
+
+        # description section
+        description = ""
+        help_section = ""
+        for item in items:
+            if item[0].lower() == 'setdescription':
+                description += format_title(item[0]) + ' '.join(item[1]) + "\n\n"
+            elif item[0].lower() == 'sethelp':
+                help_section += f"## Help\n\n{' '.join(item[1])}\n\n"
+
+        # combine description and help sections
+        description += help_section
+
+        # option and Argument sections
+        option_and_desc = ""
+        for item in items:
+            if item[0].startswith('addOption'):
+                has_option = True
+                option_title = 'Option'
+                if prev_title != option_title:
+                    option_and_desc += f"## {option_title}\n\n" 
+                option_and_desc += f"`{item[1][0]}` {format_option(item[1])}\n\n"
+                prev_title = option_title
+            elif item[0].startswith('addArgument'):
+                argument_title = 'Argument'
+                if prev_title != argument_title:
+                    option_and_desc += f"## {argument_title}\n\n"
+                option_and_desc += f"`{item[1][0]}` {format_argument(item[1])}\n\n"
+                prev_title = argument_title
+                arguments.append(item[1][0])
+
+        # usage section
+        usage = ""
+        if description:
+            first_line = name.lower()
+            if len(first_line) > 1:
+                usage = f"## Usage\n\n```bash\n{first_line} "
+                if has_option:
+                    usage += "[option(s)] "
+                if arguments:
+                    usage += ' '.join([f"<{arg}>" for arg in arguments])
+                usage += "\n```\n\n"
+
+        formatted_str += description + usage + option_and_desc
+
+        # example section
+        bash_code = f"php Thelia {name} ..." 
+        formatted_str += "## Example\n\n" + f"```bash\n{bash_code}\n```\n\n"
+        filename = name.replace(':','_') + ".md"
+        with open(filename, 'w') as f:
+            f.write(formatted_str)
+
+    return f"Markdown file(s) was/were created successfully ✅"
+
+
+
+
 if __name__ == "__main__":
     dictionnary = getCommands(input("Enter the directory to scan: "))
