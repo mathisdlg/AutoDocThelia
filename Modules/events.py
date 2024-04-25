@@ -16,9 +16,9 @@ def main() -> None:
 
     os.system("./Scripts/eventPreAnalyzer.sh -r " + eventPath)
 
-    if os.path.exists("dataArrayEvent.txt"):
+    if os.path.exists("./Scripts/dataArrayEvent.txt"):
         eventAnalyzer.main(source, destination)
-        os.remove("dataArrayEvent.txt")
-        print("dataArrayEvent.txt removed.")
+        os.remove("./Scripts/dataArrayEvent.txt")
+        print("./Scripts/dataArrayEvent.txt removed.")
     else:
         print("Error: dataArrayEvent.txt not found.")
