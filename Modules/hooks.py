@@ -1,5 +1,5 @@
 import re, sys, os
-from Common import integrate
+from Modules.Common import integrate
 
 
 def get_hooks(directory: str, file: str) -> None:

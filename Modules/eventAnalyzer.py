@@ -1,5 +1,5 @@
 import sys, os
-from Common import integrate
+from Modules.Common import integrate
 
 help="eventAnalyser.py [SOURCE FILE] [DESTINATION FILE]"
 helpAccess="-h or --help to show help"
