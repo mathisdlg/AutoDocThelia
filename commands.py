@@ -355,7 +355,15 @@ def create_markdown_from_dict(data_dict, path="output"):
 
 
 
+def main():
+    directory = input("Enter the directory to scan commands: ")
+    output = input("Enter the output directory for commands [./ouput/]: ")
+    if output == "":
+        output = "./output/"
+    dictionnary = getCommands(directory)
+    print(create_markdown_from_dict(dictionnary, output))
+
+
 
 if __name__ == "__main__":
-    dictionnary = getCommands(input("Enter the directory to scan: "))
-    print(create_markdown_from_dict(dictionnary))
+    main()
