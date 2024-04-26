@@ -45,6 +45,8 @@ def getCommands(directory: str) -> dict[str: list[list[str, list[str]]]]:
                     commandAddedOrExtendsAdded = True
                 case 1:
                     commandAddedOrExtendsAdded = True
+    
+    os.remove(".tmpCmdHelp")
 
     return commands
 
@@ -89,7 +91,9 @@ def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[
                 if extends in listExtends:
                     if line.startswith("class"):
                         isClass = True
-                        name, config = getConfig(f)
+                        name = getCommandName(f)
+                        launchCommand(name, fileIndex[0])
+                        config = parseFile()
                         commands[name] = config
                     listExtends.append(line[line.index("class ") + len("class "):indexExtends].strip())
                     fileList.remove(fileIndex)
@@ -111,151 +115,120 @@ def format(sequence: str) -> str :
     return sequence
 
 
-def getConfig(file: TextIOWrapper) -> tuple[str, list[list[str, list[str]]]] :
-    """Analyse configure function in the file
-
-    Args:
-        file (TextIOWrapper): The file to analyse
-
-    Returns:
-        tuple[str, list[list[str, list[str]]]]: The name of the command and the config
-    """
-
-    # list structure
-    # arrayAllConfig : [["setDescription", ["This command do this"]], ["addOption", ["option1", "option2"]]]
-    # arrayConfig :     |------------------------------------------|  |-----------------------------------|
-    # arrayContent :                       |----------------------|                 |--------------------|
-    arrayAllConfig = []
-    arrayConfig = []
-    arrayContent = []
+def getCommandName(file: TextIOWrapper) -> str :
+    # To get the command name
     
-    # Define if we are in a header line or not
-    header = True
+    # Define if the letter we are analyzing is part of the command name
+    isCommandName = False
     
-    # Define if the letter we analyse is part of the config name (examples : "setDescription", "addOption", ...)
-    isConfigName = False
+    commandName = ""
     
-    # Define if the letter we analyse is part of the content
-    isContent = False
-    
-    # Count the number of parents. If this number > 0, a parenthesis is open while the previous one has not yet been closed.
-    nbParenthesis = 0
-    
-    # Define if the line we are analyzing is part of the previous one
-    isReturnLine = False
-    
-    # Define if the letter we are analyzing is the first one of the current content
-    isFirstChar = True
-    # Define if the first char is a " or a '
-    firstChar = ""
-    # Count the number of first characters. If this number > 0, then the string is not closed and commas should not be treated as field separators.
-    nbFirstChar = 0
-    
-    configName = ""
-    contentName = ""
+    for line in file :
+        # Research of the line were the command name is set
+        if "->setName" in line :
+            # To get only the name field
+            lineForParsing = line.strip().split("->setName")
+            for letter in lineForParsing[1] :
+                # Begin og the command name
+                if letter == "(" :
+                    isCommandName = True
+                # End of the command name
+                if letter == ")" :
+                    isCommandName = False
+                    break
+                if isCommandName and letter != " " and letter != "\n" :
+                    commandName += letter
+        # If the command name is write on many lines
+        elif isCommandName :
+            for letter in line :
+                if letter == "(" :
+                    isCommandName = True
+                if letter == ")" :
+                    isCommandName = False
+                    break
+                if isCommandName and letter != " " and letter != "\n" :
+                    commandName += letter
 
-    for line in file:
-        if header :
-            if "function configure" in line :
-                # Begin of configure function
-                header = False
-        else:
-
-            if "->" in line and nbParenthesis == 0 :
-                listElements = line.split("->")
-                
-                for iterator in range(1, len(listElements)) :
-                    isConfigName = True
-                    isContent = False
-                    isFirstChar = True
-                    for letter in listElements[iterator] :
-                        if isContent :
-                            if isFirstChar and (letter == "\"" or letter == "\'") :
-                                isFirstChar = False
-                                firstChar = letter
-                                nbFirstChar += 1
-                            elif not isFirstChar and letter == firstChar :
-                                nbFirstChar -= 1
-                            if letter == "(" :
-                                nbParenthesis += 1
-                            if letter == "," and nbFirstChar == 0 and nbParenthesis < 2 :
-                                arrayContent.append(format(contentName.strip()))
-                                contentName = ""
-                                isFirstChar = True
-                            elif letter == ")" :
-                                nbParenthesis -= 1
-                                if (nbParenthesis == 0) :    
-                                    arrayContent.append(format(contentName.strip()))
-                                    contentName = ""
-                                    isFirstChar = True
-                                    arrayConfig.append(arrayContent)
-                                    arrayContent = []
-                                    arrayAllConfig.append(arrayConfig)
-                                    arrayConfig = []
-                                    isReturnLine = False
-                                else :
-                                    contentName += letter
-                            elif letter != "\n" :
-                                contentName += letter
-                        elif letter == "(" :
-                            nbParenthesis += 1
-                            isConfigName = False
-                            isContent = True
-                            arrayConfig.append(configName)
-                            configName = ""
-                            isReturnLine = True
-                        elif isConfigName :
-                            configName += letter
-                        
-            if "->" not in line and isReturnLine :
-                isFirstChar = True
-                for letter in line :
-                    if isFirstChar and (letter == "\"" or letter == "\'") :
-                        isFirstChar = False
-                        firstChar = letter
-                        nbFirstChar += 1
-                    elif not isFirstChar and letter == firstChar :
-                        nbFirstChar -= 1
-                        if nbFirstChar == 0 :
-                            isFirstChar = True
-                    if letter == "(" :
-                        nbParenthesis += 1
-                    if letter == "," and nbFirstChar == 0 and nbParenthesis < 2 :
-                        arrayContent.append(format(contentName.strip()))
-                        contentName = ""
-                        isFirstChar = True
-                    elif letter == ")" :
-                        
-                        nbParenthesis -= 1
-                        if (nbParenthesis == 0) : 
-                            
-                            arrayContent.append(format(contentName.strip()))
-                            contentName = ""
-                            isFirstChar = True
-                            arrayConfig.append(arrayContent)
-                            arrayContent = []
-                            arrayAllConfig.append(arrayConfig)
-                            arrayConfig = []
-                            isReturnLine = False
-                        else :
-                            contentName += letter
-                            
-                    elif letter != "\n" :
-                        contentName += letter
+    return format(commandName.strip()).strip()
 
 
-            # End of configure function
-            if "}" in line :
-                break
+def launchCommand(name: str, repository: str) -> str :
+    os.system(f"php {repository}/Thelia {name} --help 2> .tmpCmdHelp > .tmpCmdHelp")
 
-    name = "No name :("
-    for iterator in range(len(arrayAllConfig)) :
-        if arrayAllConfig[iterator][0] == "setName" :
-            name = arrayAllConfig[iterator][1][0]
-            arrayAllConfig.pop(iterator)
-            break
-    return name, arrayAllConfig
 
+def parseFile() -> list[str, str, list[list[str, str]], list[list[str, str]]] :
+    isDescription = False
+    isUsage = False
+    isArgument = False
+    isOption = False
+    isHelp = False
+    arrayCommand = ["", "", [], []]
+    fileOpened = open(".tmpCmdHelp", "r")
+    for line in fileOpened :
+        if isDescription :
+            arrayCommand[0] = line.strip()
+            isDescription = False
+        elif line == "Description:\n" :
+            isDescription = True
+            
+        if isUsage :
+            arrayCommand[1] = line.strip()
+            isUsage = False
+        elif line == "Usage:\n" :
+            isUsage = True
+            
+        if isArgument :
+            if line != "\n" :
+                arrayCommand[2].append(argumentAnalyzer(line))
+            else :
+                isArgument = False
+        elif line == "Arguments:\n" :
+            isArgument = True
+            
+        if isOption :
+            if line != "\n" :
+                if "-h, --help" in line or "-q, --quiet" in line or "-V, --version" in line or "--ansi|--no-ansi" in line or "-n, --no-interaction" in line or "-e, --env=ENV" in line or "--no-debug" in line or "-v|vv|vvv, --verbose" in line :
+                    continue
+                else :
+                    arrayCommand[3].append(optionAnalyzer(line))
+            else :
+                isOption = False
+        elif line == "Options:\n" :
+            isOption = True
+            
+        if isHelp :
+            arrayCommand.append(line.strip())
+            isHelp = False
+        elif line == "Help:\n" :
+            isHelp = True
+    return arrayCommand
+
+
+def argumentAnalyzer(line: str) -> list[str, str] :
+    arrayArguments = []
+    lineAnalyzed = line.split(" ")
+    while "" in lineAnalyzed :
+        lineAnalyzed.remove("")
+    arrayArguments.append(lineAnalyzed[0])
+    lineAnalyzed.pop(0)
+    arrayArguments.append(" ".join(lineAnalyzed).strip())
+    return arrayArguments
+
+
+def optionAnalyzer(line: str) -> list[str, str] :
+    arrayOptions = []
+    lineAnalyzed = line.split(" ")
+    while "" in lineAnalyzed :
+        lineAnalyzed.remove("")
+    if "," in lineAnalyzed[0] :
+        arrayOptions.append(lineAnalyzed[0] + " " + lineAnalyzed[1])
+        lineAnalyzed.pop(0)
+        lineAnalyzed.pop(0)
+    else :
+        arrayOptions.append(lineAnalyzed[0])
+        lineAnalyzed.pop(0)
+    arrayOptions.append(" ".join(lineAnalyzed).strip())
+    return arrayOptions
 
 
 def generate_markdown_files(data_command_dict, output_path="."):
@@ -313,7 +286,6 @@ def main(directory: str, output: str = "./output/") -> None:
         output = "./output/"
     dictionnary = getCommands(directory)
     print(generate_markdown_files(dictionnary, output))
-
 
 
 if __name__ == "__main__":
