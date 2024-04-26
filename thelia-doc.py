@@ -12,8 +12,7 @@ def help():
     print("")
     print("[0] - exit: Exit the program\n")
 
-
-if __name__ == '__main__':
+def interacive():
     print("Welcome to the documentation manager!")
     help()
     while True:
@@ -26,19 +25,77 @@ if __name__ == '__main__':
             case '1':
                 help()
             case '2':
-                hooks.main()
+                directory = input("Enter the path to the Thelia directory: ")
+                toFile = input("Enter the documentation path to modify: ")
+                order = input("Enter the order of the hooks [Y/n]: ")
+                hooks.all(directory, toFile, order)
             case '3':
-                events.main()
+                eventPath = input("Enter the path to the event directory: ")
+                destinaion = input("Enter the doc destination file path: ")
+                events.main(eventPath, destinaion)
             case '4':
-                commands.main()
+                directory = input("Enter the path to the Thelia directory: ")
+                toFile = input("Enter the documentation path to modify: ")
+                commands.main(directory, toFile)
             case '9':
-                events.main()
-                hooks.all()
+                rootThelia = input("Enter the path to the root of the Thelia project to scan (Thelia Core): ")
+                rootDoc = input("Enter the root path of the documentation to modify: ")
+                orderHook = input("Enter the order of the hooks [Y/n]: ").lower()
+
+                if orderHook != "n":
+                    orderHook = True
+
+                if not rootThelia.endswith("/"):
+                    rootThelia += "/"
+                if not rootDoc.endswith("/"):
+                    rootDoc += "/"
+
+                hooksDoc = rootDoc + "docs/hooks.md"
+                eventsDoc = rootDoc + "docs/events.md"
+                commandsDoc = rootDoc + "docs/commands/"
+
+                theliaEvents = rootThelia + "core/lib/Thelia/Core/Event/"
+
+                events.main(theliaEvents, eventsDoc)
+                hooks.all(rootThelia, hooksDoc, orderHook)
                 hooks.clean()
-                commands.main()
+                commands.main(rootThelia, commandsDoc)
             case _:
                 print("Invalid choice. Please try again.\n")
                 continue
 
     print("Goodbye!")
     sys.exit(0)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--CI":
+            rootThelia = sys.argv[2]
+            rootDoc = sys.argv[3]
+            if len(sys.argv) > 4:
+                orderHook = sys.argv[4].lower()
+            else:
+                orderHook = "y"
+
+            if not rootThelia.endswith("/"):
+                rootThelia += "/"
+            if not rootDoc.endswith("/"):
+                rootDoc += "/"
+
+            hooksDoc = rootDoc + "docs/hooks.md"
+            eventsDoc = rootDoc + "docs/events.md"
+            commandsDoc = rootDoc + "docs/commands/"
+
+            theliaEvents = rootThelia + "core/lib/Thelia/Core/Event/"
+
+            events.main(theliaEvents, eventsDoc)
+            hooks.all(rootThelia, hooksDoc, orderHook)
+            hooks.clean()
+            commands.main(rootThelia, commandsDoc)
+        else:
+            print("Usage: python3 thelia-doc.py --CI <Thelia root> <Doc root> [<orderHook: [Y/n]>]")
+            print("\tOR")
+            print("Usage: python3 thelia-doc.py")
+    else:
+        interacive()

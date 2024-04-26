@@ -157,15 +157,11 @@ def format_md_hooks(hookDict: dict, markdown: str) -> int:
     return counter
 
 
-def all() -> None:
-    directory = input("Enter the directory to scan: ")
+def all(directory: str, toFile: str, order: str = "y") -> None:
+    file = "log.txt"
+    markdownFile = "hooks.md"
 
-    file = input("Enter the file to read the hooks from [log.txt] : ")
-    markdownFile = input("Enter the file to write the hooks in [hooks.md] : ")
-
-    toFile = input("Enter the file to write the hooks in [documentation.md] : ")
-
-    order = input("Do you want to sort the hooks by key [Y/n] : ").lower()
+    order = order.lower()
 
     if not directory.startswith("./"):
         directory = "./"+directory
@@ -302,7 +298,12 @@ def main() -> None:
                     print("An error occured.\n", e)
 
             case "5":
-                all()
+                directory = input("Enter the directory to scan: ")
+                toFile = input("Enter the file to write the hooks in [documentation.md] : ")
+                if not directory.startswith("./"):
+                    directory = "./"+directory
+                order = input("Do you want to sort the hooks by key [Y/n] : ").lower()
+                all(directory, toFile, order)
 
             case "6":
                 clean()

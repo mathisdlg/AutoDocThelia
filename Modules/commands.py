@@ -399,15 +399,13 @@ def create_markdown_from_dict(data_dict: dict[str: str|list[list[str, list[str]]
         with open(filename, 'w') as f:
             f.write(formatted_str.rstrip() + "\n")
 
-    return f"Markdown file(s) was/were created successfully ✅"
+    return "Markdown file(s) was/were created successfully ✅"
 
 
 
-def main() -> None:
+def main(directory: str, output: str = "./output/") -> None:
     """Main function to get the directory and output directory and create the markdown file(s) from the commands in the directory
     """
-    directory = input("Enter the directory to scan commands: ")
-    output = input("Enter the output directory for commands [./ouput/]: ")
     if output == "":
         output = "./output/"
     dictionnary = getCommands(directory)
@@ -416,4 +414,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    directory = input("Enter the directory to scan commands: ")
+    output = input("Enter the output directory for commands [./ouput/]: ")
+    main(directory, output)
