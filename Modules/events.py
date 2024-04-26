@@ -1,5 +1,5 @@
 import os
-import Modules.eventAnalyzer
+import Modules.eventAnalyzer as eventAnalyzer
 
 
 def main() -> None:
