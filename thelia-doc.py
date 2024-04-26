@@ -1,5 +1,5 @@
 import sys
-import Modules.hooks as hooks, Modules.events as events, Modules.commands as commands
+import Modules.hooks as hooks, Modules.events as events, Modules.commands as commands, Modules.check as check
 
 
 def help():
