@@ -170,3 +170,4 @@ output/
 
 #Mac
 .DS_Store
+.tmpCmdHelp
