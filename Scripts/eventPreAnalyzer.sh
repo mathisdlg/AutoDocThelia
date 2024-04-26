@@ -5,13 +5,6 @@ browse_files_current_directory() {
     local path=$1
     local output_file=$2
 
-    # check if path is valid
-    if [ ! -d "$path" ]; then
-        echo "Error: Directory '$path' not found."
-        exit 1
-    fi
-
-
     # browse all files in the current directory
     find "$path" -maxdepth 1 -type f ! -name ".*" | sort | while read file; do
 
@@ -32,7 +25,7 @@ browse_files_current_directory() {
         class=$(grep -o -m 1 'class\s*\(\w\+\)' "$file" | sed 's/class\s*//')
 
         # extract constructor arguments
-        constructor=$(awk '/__construct\(/,/)/' "$file" | tr -d '\n' | sed 's/__construct\s*//; s/(\(.*\))/\1/' | awk -F '[, ]+' '{for(i=1;i<=NF;i++) if($i ~ /^\$/) print $i}' | sed 's/[()]//g' | sort -u | tr '\n' ' ')
+        constructor=$(awk '/__construct\(/,/)/' "$file" | tr -d '\n' | sed -n 's/.*__construct\s*(\([^)]*\)).*/\1/p' | sed 's/,\s*/\n/g' | sed 's/^\s*//; s/\s*$//' | awk '{$1=$1};1' | sort -u | tr '\n' ', ')
 
         if [ -z "$constructor" ]; then
             echo -n "- $class -> no constructor found in this file  \n" >> "$output_file"
@@ -75,8 +68,12 @@ elif [ -e "$output_file" ] && [ "$replace" = false ]; then
     exit 1
 fi
 
-
-echo -n "[[noCategory," >> "$output_file"
+# check if the path contains files or directories at its root to adapt the output
+if [ "$(find "$path" -mindepth 1 -maxdepth 1 -not -name '.*')" ]; then
+    echo -n "[[noCategory," >> "$output_file"
+else
+    echo -n "[[" >> "$output_file"
+fi
 
 # files at the root
 browse_files_current_directory "$path" "$output_file"

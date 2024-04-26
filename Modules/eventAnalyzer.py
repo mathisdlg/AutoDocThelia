@@ -4,7 +4,7 @@ from Modules.Common import integrate
 help="eventAnalyser.py [SOURCE FILE] [DESTINATION FILE]"
 helpAccess="-h or --help to show help"
 
-def main(sourceFile, saveFile):
+def main(sourceFile, saveFile, docFile):
     # the file path where the data array is
 
     arrayFile = "dataArrayEvent.txt"
@@ -182,7 +182,6 @@ def main(sourceFile, saveFile):
         file.write("</details>\n\n")
     
     # Integration of the modifications directly in thhe Thelia events documentation
-    docFile = input("Enter the events documentation file to modify : ")
     integrate(saveFile, docFile, "Every event list")
 
         

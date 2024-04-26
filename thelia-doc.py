@@ -1,5 +1,5 @@
-import sys, os
-import Modules.hooks as hooks, Modules.events as events, Modules.commands as commands
+import sys
+import Modules.hooks as hooks, Modules.events as events, Modules.commands as commands, Modules.check as check
 
 
 def help():
@@ -8,12 +8,11 @@ def help():
     print("[2] - go to hooks documentation manager")
     print("[3] - generate events documentation")
     print("[4] - generate commands documentation")
-    print("[9] - generate events and hooks documentation")
+    print("[9] - generate all documentation")
     print("")
     print("[0] - exit: Exit the program\n")
 
-
-if __name__ == '__main__':
+def interacive():
     print("Welcome to the documentation manager!")
     help()
     while True:
@@ -26,19 +25,95 @@ if __name__ == '__main__':
             case '1':
                 help()
             case '2':
-                hooks.main()
+                directory = input("Enter the path to the Thelia directory: ")
+                toFile = input("Enter the documentation path to modify: ")
+                order = input("Enter the order of the hooks [Y/n]: ")
+                hooks.all(directory, toFile, order)
             case '3':
-                events.main()
+                eventPath = input("Enter the path to the event directory: ")
+                destinaion = input("Enter the doc destination file path: ")
+                events.main(eventPath, destinaion)
             case '4':
-                commands.main()
+                directory = input("Enter the path to the Thelia directory: ")
+                toFile = input("Enter the documentation path to modify: ")
+                commands.main(directory, toFile)
             case '9':
-                events.main()
-                hooks.all()
+                rootThelia = input("Enter the path to the root of the Thelia project to scan (Thelia Core): ")
+                rootDoc = input("Enter the root path of the documentation to modify: ")
+                orderHook = input("Enter the order of the hooks [Y/n]: ").lower()
+
+                if orderHook != "n":
+                    orderHook = True
+
+                if not rootThelia.endswith("/"):
+                    rootThelia += "/"
+                if not rootDoc.endswith("/"):
+                    rootDoc += "/"
+
+                hooksDoc = rootDoc + "docs/hooks.md"
+                eventsDoc = rootDoc + "docs/events.md"
+                commandsDoc = rootDoc + "docs/commands/"
+
+                theliaEvents = rootThelia + "core/lib/Thelia/Core/Event/"
+
+                events.main(theliaEvents, eventsDoc)
+                hooks.all(rootThelia, hooksDoc, orderHook)
                 hooks.clean()
-                commands.main()
+                commands.main(rootThelia, commandsDoc)
             case _:
                 print("Invalid choice. Please try again.\n")
                 continue
 
     print("Goodbye!")
     sys.exit(0)
+
+
+def generate():
+    rootThelia = sys.argv[3]
+    rootDoc = sys.argv[4]
+    if len(sys.argv) > 5:
+        orderHook = sys.argv[5].lower()
+    else:
+        orderHook = "y"
+
+    if not rootThelia.endswith("/"):
+        rootThelia += "/"
+    if not rootDoc.endswith("/"):
+        rootDoc += "/"
+
+    hooksDoc = rootDoc + "docs/hooks.md"
+    eventsDoc = rootDoc + "docs/events.md"
+    commandsDoc = rootDoc + "docs/commands/"
+
+    theliaEvents = rootThelia + "core/lib/Thelia/Core/Event/"
+
+    events.main(theliaEvents, eventsDoc)
+    hooks.all(rootThelia, hooksDoc, orderHook)
+    hooks.clean()
+    commands.main(rootThelia, commandsDoc)
+
+
+def check():
+    raise NotImplementedError("Not implemented yet")
+
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--CI":
+            if len(sys.argv)>4 and sys.argv[2] == "--generate":
+                generate()
+                sys.exit(0)
+            elif len(sys.argv)>3 and sys.argv[2] == "--check":
+                check()
+                sys.exit(0)
+            
+        print("Usage:")
+        print("By args:")
+        print("\tpython3 thelia-doc.py --CI --generate <Thelia root> <Doc root> [<orderHook: [Y/n]>]")
+        print("OR")
+        print("\tpython3 thelia-doc.py --CI --check <Thelia root>")
+        print("By interactive shell")
+        print("\tUsage: python3 thelia-doc.py")
+    else:
+        interacive()

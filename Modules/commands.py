@@ -231,156 +231,57 @@ def optionAnalyzer(line: str) -> list[str, str] :
     return arrayOptions
 
 
-def format_title(title: str) -> str:
-    """Formats the title to ensure it starts with '## ' and includes only the first uppercase letters
-
-    Args:
-        title (str): The title to format
-
-    Returns:
-        str: The formatted title
+def generate_markdown_files(data_command_dict, output_path="."):
     """
-    # formats the title to ensure it starts with '## ' and includes only the first uppercase letters
-    formatted_title = "## "
-    found_upper = False
-    used_words = set()
-    for char in title:
-        if char.isupper():
-            found_upper = True
-            formatted_title += char
-        elif found_upper:
-            if char.isalpha() and char.lower() not in used_words:
-                used_words.add(char.lower())
-                formatted_title += char
-    return formatted_title + "\n\n" 
+        function that generates as many markdown files as there are keys in the dictionary
 
+        Args: data_command_dict -> a dictionary that contains every command's informations
+              output_path -> optional argument which is the path where then markdown file(s) will be created
 
-def format_option(option: list[str]) -> str:
-    """Formats the option by filtering out 'null' and 'InputOption' parameters
-
-    Args:
-        option (list[str]): The option to format
-
-    Returns:
-        str: The formatted option
+        Return: a string if everything went well
     """
-    first_param = option[0]
-    if isinstance(first_param, list):
-        first_param = ' '.join(first_param)
-    if 'InputOption' in first_param:
-        return ' '.join(option)
-    filtered_option = [param for param in option[1:] if 'null' not in param and 'InputOption' not in param]
-    if not filtered_option:
-        return ''
-    return ' '.join(filtered_option)
+    # Créer le répertoire de sortie s'il n'existe pas
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
 
+    for dictKey, dictValue in data_command_dict.items():
+        file_name = os.path.join(output_path, dictKey+".md")
+        #file_name = f"{output_path}/{dictKey}.md"
+        with open(file_name, "w") as f:
+            # Write title with docusaurus
+            f.write(f"---\ntitle: {dictKey}\n---\n\n")
 
-def format_argument(argument: list[str]) -> str:
-    """Formats the argument by filtering out 'null' and 'InputArgument' parameters
+            # write description
+            f.write(f"{dictValue[0]}\n\n")
+            
+            # write usage
+            f.write("## Usage\n\n")
+            f.write(f"`{dictValue[1]}`\n\n")
+            
+            # write arguments
+            f.write("## Argument\n\n")
+            for arg in dictValue[2]:
+                f.write(f"* `{arg[0]}`: {arg[1]}\n")
+            f.write("\n")
+            
+            # write options
+            f.write("## Option\n\n")
+            for option in dictValue[3]:
+                f.write(f"* `{option[0]}`: {option[1]}\n")
+            f.write("\n")
+            
+            # write help if available
+            if len(dictValue) > 4:
+                f.write("## Help\n\n")
+                f.write(f"{dictValue[4]}\n")
 
-    Args:
-        argument (list[str]): The argument to format
-
-    Returns:
-        str: The formatted argument
-    """
-    first_param = argument[0]
-    if isinstance(first_param, list):
-        first_param = ' '.join(first_param)
-    if 'InputArgument' in first_param:
-        return ' '.join(argument)
-    filtered_argument = [param for param in argument[1:] if 'null' not in param and 'InputArgument' not in param]
-    if not filtered_argument:
-        return ''
-    return ' '.join(filtered_argument)
-
-
-def create_markdown_from_dict(data_dict: dict[str: str|list[list[str, list[str]]]], path: str="output") -> str:
-    """Creates markdown file(s) from the dictionary
-
-    Args:
-        data_dict (dict): the dictionary containing the command names and their respective configurations
-        path (str, optional): The path to save the markdown file(s). Defaults to "output".
-
-    Returns:
-        str: The message indicating the markdown file(s) was/were created successfully
-    """
-
-    for name, items in data_dict.items():
-        formatted_str = ""
-        has_option = False
-        arguments = []
-        prev_title = None 
-
-        # Title1 section
-        formatted_str += f"# {name.lower()}\n\n"
-
-        # description section
-        description = ""
-        help_section = ""
-        for item in items:
-            if item[0].lower() == 'setdescription':
-                description += format_title(item[0]) + ' '.join(item[1]) + "\n\n"
-            elif item[0].lower() == 'sethelp':
-                help_section += f"## Help\n\n{' '.join(item[1])}\n\n"
-
-        # combine description and help sections
-        description += help_section
-
-        # option and Argument sections
-        option_and_desc = ""
-        for item in items:
-            if item[0].startswith('addOption'):
-                has_option = True
-                option_title = 'Option'
-                if prev_title != option_title:
-                    option_and_desc += f"## {option_title}\n\n" 
-                option_and_desc += f"- `{item[1][0]}` {format_option(item[1])}\n\n"
-                prev_title = option_title
-            elif item[0].startswith('addArgument'):
-                argument_title = 'Argument'
-                if prev_title != argument_title:
-                    option_and_desc += f"## {argument_title}\n\n"
-                option_and_desc += f"- `{item[1][0]}` {format_argument(item[1])}\n\n"
-                prev_title = argument_title
-                arguments.append(item[1][0])
-
-        # usage section
-        usage = ""
-        if description:
-            first_line = name.lower()
-            if len(first_line) > 1:
-                usage = f"## Usage\n\n```bash\n{first_line} "
-                if has_option:
-                    usage += "[option(s)] "
-                if arguments:
-                    usage += ' '.join([f"<{arg}>" for arg in arguments])
-                usage += "\n```\n\n"
-
-        formatted_str += description + usage + option_and_desc
-
-        # example section
-        bash_code = f"php Thelia {name} ..." 
-        formatted_str += "## Example\n\n" + f"```bash\n{bash_code}\n```\n\n"
-        filename = name.replace(':','_') + ".md"
-
-        if path:
-            filename = os.path.join(path, filename)
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        with open(filename, 'w') as f:
-            f.write(formatted_str.rstrip() + "\n")
-
-    return f"Markdown file(s) was/were created successfully ✅"
+    return "Markdown file(s) was/were created successfully ✅"      
 
 
 
-def main() -> None:
+def main(directory: str, output: str = "./output/") -> None:
     """Main function to get the directory and output directory and create the markdown file(s) from the commands in the directory
     """
-    directory = input("Enter the directory to scan commands: ")
-    output = input("Enter the output directory for commands [./ouput/]: ")
     if output == "":
         output = "./output/"
     dictionnary = getCommands(directory)
@@ -388,4 +289,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    directory = input("Enter the directory to scan commands: ")
+    output = input("Enter the output directory for commands [./ouput/]: ")
+    main(directory, output)
