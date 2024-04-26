@@ -69,10 +69,10 @@ def interacive():
 
 
 def generate():
-    rootThelia = sys.argv[2]
-    rootDoc = sys.argv[3]
-    if len(sys.argv) > 4:
-        orderHook = sys.argv[4].lower()
+    rootThelia = sys.argv[3]
+    rootDoc = sys.argv[4]
+    if len(sys.argv) > 5:
+        orderHook = sys.argv[5].lower()
     else:
         orderHook = "y"
 
