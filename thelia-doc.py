@@ -8,7 +8,7 @@ def help():
     print("[2] - go to hooks documentation manager")
     print("[3] - generate events documentation")
     print("[4] - generate commands documentation")
-    print("[9] - generate events and hooks documentation")
+    print("[9] - generate all documentation")
     print("")
     print("[0] - exit: Exit the program\n")
 
