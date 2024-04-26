@@ -1,4 +1,4 @@
-import sys, os
+import sys
 import Modules.hooks as hooks, Modules.events as events, Modules.commands as commands
 
 
@@ -68,34 +68,52 @@ def interacive():
     sys.exit(0)
 
 
+def generate():
+    rootThelia = sys.argv[2]
+    rootDoc = sys.argv[3]
+    if len(sys.argv) > 4:
+        orderHook = sys.argv[4].lower()
+    else:
+        orderHook = "y"
+
+    if not rootThelia.endswith("/"):
+        rootThelia += "/"
+    if not rootDoc.endswith("/"):
+        rootDoc += "/"
+
+    hooksDoc = rootDoc + "docs/hooks.md"
+    eventsDoc = rootDoc + "docs/events.md"
+    commandsDoc = rootDoc + "docs/commands/"
+
+    theliaEvents = rootThelia + "core/lib/Thelia/Core/Event/"
+
+    events.main(theliaEvents, eventsDoc)
+    hooks.all(rootThelia, hooksDoc, orderHook)
+    hooks.clean()
+    commands.main(rootThelia, commandsDoc)
+
+
+def check():
+    raise NotImplementedError("Not implemented yet")
+
+
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] == "--CI":
-            rootThelia = sys.argv[2]
-            rootDoc = sys.argv[3]
-            if len(sys.argv) > 4:
-                orderHook = sys.argv[4].lower()
-            else:
-                orderHook = "y"
-
-            if not rootThelia.endswith("/"):
-                rootThelia += "/"
-            if not rootDoc.endswith("/"):
-                rootDoc += "/"
-
-            hooksDoc = rootDoc + "docs/hooks.md"
-            eventsDoc = rootDoc + "docs/events.md"
-            commandsDoc = rootDoc + "docs/commands/"
-
-            theliaEvents = rootThelia + "core/lib/Thelia/Core/Event/"
-
-            events.main(theliaEvents, eventsDoc)
-            hooks.all(rootThelia, hooksDoc, orderHook)
-            hooks.clean()
-            commands.main(rootThelia, commandsDoc)
-        else:
-            print("Usage: python3 thelia-doc.py --CI <Thelia root> <Doc root> [<orderHook: [Y/n]>]")
-            print("\tOR")
-            print("Usage: python3 thelia-doc.py")
+            if len(sys.argv)>4 and sys.argv[2] == "--generate":
+                generate()
+                sys.exit(0)
+            elif len(sys.argv)>3 and sys.argv[2] == "--check":
+                check()
+                sys.exit(0)
+            
+        print("Usage:")
+        print("By args:")
+        print("\tpython3 thelia-doc.py --CI --generate <Thelia root> <Doc root> [<orderHook: [Y/n]>]")
+        print("OR")
+        print("\tpython3 thelia-doc.py --CI --check <Thelia root>")
+        print("By interactive shell")
+        print("\tUsage: python3 thelia-doc.py")
     else:
         interacive()
