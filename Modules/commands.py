@@ -40,7 +40,7 @@ def getCommands(directory: str) -> dict[str: list[list[str, list[str]]]]:
     while commandAddedOrExtendsAdded:
         commandAddedOrExtendsAdded = False
         for fileIndex in fileList:
-            match getFileConfig(fileIndex, commands, fileList, listExtends):
+            match getFileConfig(fileIndex, commands, fileList, listExtends, directory):
                 case 0:
                     commandAddedOrExtendsAdded = True
                 case 1:
@@ -69,7 +69,7 @@ def canBeACommand(path: str) -> int:
     return -1
 
 
-def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str]) -> int:
+def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str], directory: str) -> int:
     """Get the config of the file
 
     Args:
@@ -92,7 +92,7 @@ def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[
                     if line.startswith("class"):
                         isClass = True
                         name = getCommandName(f)
-                        launchCommand(name, fileIndex[0])
+                        launchCommand(name, directory)
                         config = parseFile()
                         commands[name] = config
                     listExtends.append(line[line.index("class ") + len("class "):indexExtends].strip())
@@ -132,6 +132,7 @@ def getCommandName(file: TextIOWrapper) -> str :
                 # Begin og the command name
                 if letter == "(" :
                     isCommandName = True
+                    continue
                 # End of the command name
                 if letter == ")" :
                     isCommandName = False
@@ -143,6 +144,7 @@ def getCommandName(file: TextIOWrapper) -> str :
             for letter in line :
                 if letter == "(" :
                     isCommandName = True
+                    continue
                 if letter == ")" :
                     isCommandName = False
                     break
