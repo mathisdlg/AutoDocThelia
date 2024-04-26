@@ -50,12 +50,12 @@ Pour obtenir le résultat de l'analyse dans le fichier par défaut 'parsedEvents
 `python3 eventAnalyser.py [FICHIER SOURCE]`
 
 Le fichier source doit être le fichier TheliaEvents.php.  
-Vous devez inclure le chemin absolu dans le nom des fichiers.  
+Vous devez inclure le chemin d'accès du fichier (nom du fichier inclu).  
 Le fichier `dataArrayEvent.txt` généré par eventPreAnalyser.sh doit exister dans le repertoire courant.
 
 Les options `-h`et `--help` permettent d'accéder rapidement à cette description (en anglais uniquement).  
 
-Le script demandera le fichier de documentation des événements Thelia qui sera modifié.   
+Le script demandera le fichier de documentation des événements Thelia qui sera modifié.
 
 # English documentation
 

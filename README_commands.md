@@ -15,8 +15,16 @@ Ce script scrape les commandes de Thelia et de génère automatiquement la docum
 - Il est possible de choisir le chemin dans lequel on veut que le(s) fichier(s) soi(en)t créé(s). Par défaut, il(s) sera/seront créé(s) dans un nouveau dossier 'output' dans le répertoire courant.
 - Pour lancer le programme, utilisez la forme suivante: `python3 nomFichier.py [chemin/de/sortie]`  
 exemple: `python3 commands.py` ou `python3 commands.py ./doc/commands`
-- Pour reconnaitre les arguments, options , descriptions et helps, le script se réfère aux termes `addArgument`, `addOption`, `setDescription` et `setHelp`.
-- Les arguments et options à afficher sont triés. Ceux contenant les terms `InputArgument`, `InputOption` ou `null`ne seront pas affichés.
+- Pour reconnaitre les arguments, options , descriptions et helps, le script se réfère à l'ordre des données reçues dans le tableau.  
+    Exemple du format: ``` python
+    data_command_dict = {
+    "Commande1": [
+        "descriptionCommande1",
+        "usageCommande1",
+        [["arg1Commande1", "descArg1Commande1"],["arg2Commande1", "descArg2Commande1"]],
+        [["option1Commande1", "descOption1Commande1"],["arg2Commande1", "descOption2Commande1"]],
+        "help1Commande1"
+    ], ...}```
 
 ### Sources de problèmes connues
 
