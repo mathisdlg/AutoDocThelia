@@ -1,4 +1,4 @@
-# Documentation Française
+# Documentation française
 
 Ce programme python permet de générer la documentation d'un projet Thelia à partir de ses fichiers sources.
 
@@ -297,3 +297,9 @@ Allows you to do the documentation of hooks and events in a single command and c
 > Enter the directory to scan commands: <The root path of the project to scan>
 > Enter the output directory for commands [./ouput/]: <The output directory for commands>
 ```
+
+## Made by
+
+- [Mnordest](https://github.com/mnordest)
+- [Noa](https://github.com/NoaSlld)
+- [Mathisdlg](https://github.com/mathisdlg)
