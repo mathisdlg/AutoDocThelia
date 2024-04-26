@@ -312,7 +312,7 @@ def main(directory: str, output: str = "./output/") -> None:
     if output == "":
         output = "./output/"
     dictionnary = getCommands(directory)
-    print(create_markdown_from_dict(dictionnary, output))
+    print(generate_markdown_files(dictionnary, output))
 
 
 
