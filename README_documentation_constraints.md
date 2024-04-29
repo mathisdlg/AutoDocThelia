@@ -1,6 +1,6 @@
-# Constraints list
+# Contraintes de documentation pour automatiser la documentation
 
-## Constraints for event documentation
+## Contraintes pour la documentation des évènements
 
 - eventPreAnalizer.sh:
   - la mention `@deprecated` dans les fichier des évènements permet au script de reconnaitre l'évènnement comme étant déprécié.
@@ -12,8 +12,36 @@
             ```
 - eventAnalizer.py:
   - Le fichier contenant la déclaration de tous les évènements doit s'appeler `TheliaEvents.php`.  
-  - Le fichier fournit à 'eventAnalyser.py' doit se trouver dans le même répertoire que lui.
+  - Le fichier fournit à 'eventAnalyser.py' doit se trouver dans le même répertoire que lui.  
+
+Voir plus de [détails](./README_events.md)
+
+## Contraintes pour la documentation des commandes
+
+- Pour reconnaitre les descriptions, options, arguments et help le script se base sur l'ordre des éléments dans le tableau. Ainsi le premier élément sera la description, le deuxième sera le usage, suivi d'un tableau d'argument, d'un tableau d'options et d'un help qui est facultatif. Cet ordre provient de l'utilisation de l'option `-h` de chacune de commande.  
+
+Voir plus de [détails](./README_commands.md)
+
+# Documentation constraints to automate documentation
+
+## Constraints for events documentation
+
+- eventPreAnalizer.sh:
+  - the mention `@deprecated` in the event files allows the script to recognize the event as being deprecated.
+  - the path of the event replacing the deprecated one must be noted after the '@deprecated' statement.
+    example: ```php
+            /**
+            * @deprecated since 2.4, please use \Thelia\Model\Event\AttributeAvEvent
+            */
+            ```
+- eventAnalizer.py:
+  - The file containing the declaration of all events must be called `TheliaEvents.php`.
+  - The file provided to 'eventAnalyser.py' must be located in the same directory as it.  
+
+Get more [details](./README_events.md)
 
 ## Constraints for commands documentation
 
-- Pour reconnaitre les descriptions, options, arguments et help le script se base sur l'ordre des éléments dans le tableau. Ainsi le premier élément sera la description, le deuxième sera le usage, suivi de l'argument, des options et du help qui est facultatif. Cet ordre provient de l'utilisation de l'option `-h` après chacune de commande.
+- To recognize descriptions, options, arguments and help, the script is based on the order of the elements in the table. So the first element will be the description, the second will be the usage, followed by an argument array, an options array and a help which is optional. This order comes from the use of the `-h` option of each command.  
+
+Get more [details](./README_commands.md)
