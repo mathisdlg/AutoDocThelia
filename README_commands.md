@@ -16,7 +16,7 @@ Ce script scrape les commandes de Thelia et de génère automatiquement la docum
 - Pour lancer le programme, utilisez la forme suivante: `python3 nomFichier.py [chemin/de/sortie]`  
 exemple: `python3 commands.py` ou `python3 commands.py ./doc/commands`
 - Pour reconnaitre les arguments, options , descriptions et helps, le script se réfère à l'ordre des données reçues dans le tableau.  
-    Exemple du format: ``` python
+    Exemple du format: ```python
     data_command_dict = {
     "Commande1": [
         "descriptionCommande1",
@@ -25,38 +25,6 @@ exemple: `python3 commands.py` ou `python3 commands.py ./doc/commands`
         [["option1Commande1", "descOption1Commande1"],["arg2Commande1", "descOption2Commande1"]],
         "help1Commande1"
     ], ...}```
-
-### Sources de problèmes connues
-
-❌ Ecrire `->` juste après la parenthèse d'un élément sur plusieurs lignes entrainera un bug. Exemple à ne pas faire :
-
-```php
-...
-->addOption(
-    'with-dependencies',
-    null,
-    InputOption::VALUE_NONE,
-    'option name'
-)->addArgument(
-    'module',
-...
-```
-
-✅ Si l'élément n'est pas sur plusieurs lignes ou si les `->` ne suivent pas directement un élément sur plusieurs lignes, cela marchera. Exemples :
-
-```php
-...
-->setName('module:name')
-->setDescription('Do something')->addOption(
-    'with-dependencies',
-    null,
-    InputOption::VALUE_NONE,
-    'option name'
-)
-->addArgument(
-    'module',
-...
-```
 
 ________________
 
@@ -77,37 +45,13 @@ This script scrapes Thelia commands and automatically generates markdown documen
 - It is possible to choose the path in which you want the file(s) to be created. By default, it will be created in a new 'output' folder in the current directory.
 - To launch the program, use the following structure: `python3 filename.py [output/path]`
 example: `python3 commands.py` or `python3 commands.py ./doc/commands`
-- To recognize arguments, options, descriptions and helps, the script refers to the terms `addArgument`, `addOption`, `setDescription` and `setHelp`.
-- The arguments and options to display are sorted. Those containing the terms `InputArgument`, `InputOption` or `null` will not be displayed.
-
-### Known sources of problems
-
-❌ Writing `->` just after the parenthesis of an element on several lines will cause a bug. Example of what not to do :
-
-```php
-...
-->addOption(
-    'with-dependencies',
-    null,
-    InputOption::VALUE_NONE,
-    'option name'
-)->addArgument(
-    'module',
-...
-```
-
-✅ If the element is not on several lines or if the `->` do not directly follow an element on several lines, this will work. Examples :
-
-```php
-...
-->setName('module:name')
-->setDescription('Do something')->addOption(
-    'with-dependencies',
-    null,
-    InputOption::VALUE_NONE,
-    'option name'
-)
-->addArgument(
-    'module',
-...
-```
+- To recognize arguments, options, descriptions and helps, the script refers to the order of the data received in the table.  
+    Example of the format: ```python
+    data_command_dict = {
+    "Command1": [
+        "descriptionCommand1",
+        "useCommand1",
+        [["arg1Command1", "descArg1Command1"],["arg2Command1", "descArg2Command1"]],
+        [["option1Command1", "descOption1Command1"],["arg2Command1", "descOption2Command1"]],
+        "help1Command1"
+    ], ...}```
