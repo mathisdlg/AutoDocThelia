@@ -22,6 +22,10 @@ Voir plus de [détails](./README_events.md)
 
 Voir plus de [détails](./README_commands.md)
 
+## Contraintes pour la documentation des hooks
+
+- Le répertoire contenant les templates doit impérativement s'appeler 'templates'.
+
 # Documentation constraints to automate documentation
 
 ## Constraints for events documentation
@@ -45,3 +49,7 @@ Get more [details](./README_events.md)
 - To recognize descriptions, options, arguments and help, the script is based on the order of the elements in the table. So the first element will be the description, the second will be the usage, followed by an argument array, an options array and a help which is optional. This order comes from the use of the `-h` option of each command.  
 
 Get more [details](./README_commands.md)
+
+## Constraints for hook documentation
+
+- The directory containing the templates must be called 'templates'.

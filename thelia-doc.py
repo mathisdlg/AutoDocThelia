@@ -29,7 +29,7 @@ def interacive():
             case '2':
                 directory = input("Enter the path to the Thelia directory: ")
                 toFile = input("Enter the documentation path to modify: ")
-                order = input("Enter the order of the hooks [Y/n]: ")
+                order = input("Would you like to sort the hooks [Y/n]: ")
                 hooks.all(directory, toFile, order)
             case '3':
                 eventPath = input("Enter the path to the event directory: ")
@@ -42,7 +42,7 @@ def interacive():
             case '9':
                 rootThelia = input("Enter the path to the root of the Thelia project to scan (Thelia Core): ")
                 rootDoc = input("Enter the root path of the documentation to modify: ")
-                orderHook = input("Enter the order of the hooks [Y/n]: ").lower()
+                orderHook = input("Would you like to sort the hooks: ").lower()
 
                 if orderHook != "n":
                     orderHook = True
