@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import Modules.hooks as hooks, Modules.events as events, Modules.commands as commands, Modules.check as check
 
