@@ -1,3 +1,5 @@
+import os
+
 # To analyze loop files and generate the documentation associated with the code
 
 def parser() :
@@ -64,7 +66,7 @@ def copy_examples_section(file_content):
 
 
 
-def generate_markdown(data):
+def generate_markdown(data, output_path=None):
     title, description, arguments, outputs, orders = data
 
     # read the content of the Markdown file and retrieve "Example" if they exist
@@ -75,7 +77,6 @@ def generate_markdown(data):
         file_content = ""
 
     examples_content = copy_examples_section(file_content)
-
 
     # create the title and description
     content = f"# {title}\n\n" + '`{' + f'loop type="{title}" name="the-loop-name" [argument="value"], [...]' + '}`\n'
@@ -90,6 +91,15 @@ def generate_markdown(data):
 
     content += generate_section("Orders", orders)
 
+    # determine the output file path
+    if output_path:
+        # create the directory if it doesn't exist
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        output_file_path = f"{output_path}/{title.replace(' ', '_')}.md"
+    else:
+        output_file_path = f"{title.replace(' ', '_')}.md"
+
     # write to the Markdown file
-    with open(f"{title.replace(' ', '_')}.md", "w") as file:
+    with open(output_file_path, "w") as file:
         file.write(content)
