@@ -131,7 +131,7 @@ def generate_markdown(data, output_path=None):
     examples_content = copy_examples_section(file_content)
 
     # create the title and description
-    content = f"# {title}\n\n" + '`{' + f'loop type="{title}" name="the-loop-name" [argument="value"], [...]' + '}`\n'
+    content = f"# {title}\n\n" + description + "\n"
 
     # create the first sections
     content += generate_section("Arguments", arguments)
