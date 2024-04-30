@@ -1,4 +1,4 @@
 import os
 
-def chack():
+def check():
     ...
