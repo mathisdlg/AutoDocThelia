@@ -2,8 +2,60 @@ import os
 
 # To analyze loop files and generate the documentation associated with the code
 
-def parser() :
-    ...
+def parser(loopFolder):
+    dictLoop = {}
+    for loopFile in sorted(os.listdir(loopFolder)):
+        if loopFile.endswith(".php"):
+            with open(os.path.join(loopFolder, loopFile), "r") as file:
+                loopTmpDict = {}
+                abstract = False
+                args = [["Argument", "Description", "Default", "Example"]]
+                outputs = [["Name", "Value"]]
+                orders = [["Ascendant", "Descendant", "Sorted field"]]
+                lines = file.readlines()
+                for i in range(0, len(lines)):
+                    line = lines[i]
+                    if line.startswith("abstract"):
+                        abstract = True
+                        break
+                    elif line.startswith("class"):
+                        loopTmpDict["Name"] = line.split(" ")[1].strip()
+                    elif "#doc-usage" in line:
+                        if loopTmpDict.get("Desc") is None:
+                            loopTmpDict["Desc"] = "`"+line.split("#doc-usage")[1].strip()+"`"
+                        else:
+                            loopTmpDict["Desc"] += "  \n"+"`"+line.split("#doc-usage")[1].strip()+"`"
+                    elif "#doc-desc" in line:
+                        desc = line.split("#doc-desc")[1].strip()
+                        if loopTmpDict.get("Desc") is None:
+                            loopTmpDict["Desc"] = desc
+                        else:
+                            loopTmpDict["Desc"] = desc+"  \n"+loopTmpDict["Desc"]
+                    elif "#doc-arg-name" in line:
+                        name = line.split("#doc-arg-name")[1].strip()
+                        desc = ""
+                        default = ""
+                        example = ""
+                        for x in range(1, 4):
+                            nextLine = lines[i+x]
+                            if "*/" in nextLine or nextLine.strip().split("*")[1].strip() == "":
+                                break
+                            match nextLine.strip().split(" ")[1]: # TODO
+                                case "#doc-arg-desc":
+                                    desc = nextLine.split("#doc-arg-desc")[1].strip()
+                                case "#doc-arg-default":
+                                    default = nextLine.split("#doc-arg-default")[1].strip()
+                                case "#doc-arg-example":
+                                    example = nextLine.split("#doc-arg-example")[1].strip()
+                        args.append([name, desc, default, example])
+                    elif "#doc-out-name" in line:
+                        name = line.split("#doc-out-name")[1].strip()
+                        value = lines[i+1].split("#doc-out-desc")[1].strip()
+                        outputs.append([name, value])
+                            
+            if not abstract:
+                dictLoop[loopFile] = [loopTmpDict["Name"], loopTmpDict["Desc"], args, outputs, orders]
+    return dictLoop
 
 
 def generate_section(title, data):
@@ -103,3 +155,8 @@ def generate_markdown(data, output_path=None):
     # write to the Markdown file
     with open(output_file_path, "w") as file:
         file.write(content)
+
+if __name__ == "__main__":
+    loopFolder = "thelia/core/lib/Thelia/Core/Template/Loop/"
+    test = list(parser(loopFolder).values())[0]
+    generate_markdown(test, "output")
