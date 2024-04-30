@@ -1,5 +1,5 @@
 import os
-import Modules.eventAnalyzer as eventAnalyzer
+import Modules.eventAnalyzer as eventAnalyzer, Modules.eventPreAnalyzer as eventPreAnalyzer
 
 
 def main(eventPath: str, docFile: str) -> None:
@@ -10,7 +10,7 @@ def main(eventPath: str, docFile: str) -> None:
     if not eventPath.endswith("/"):
         eventPath += "/"
 
-    os.system("./Scripts/eventPreAnalyzer.sh -r " + eventPath)
+    eventPreAnalyzer.main(eventPath)
 
     if os.path.exists("./dataArrayEvent.txt"):
         source = eventPath + "TheliaEvents.php"

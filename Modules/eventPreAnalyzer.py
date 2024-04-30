@@ -1,6 +1,4 @@
-import os
-import sys
-import re
+import os, re
 
 # function to browse files in the current directory and retrieve information
 def browse_files_current_directory(path, output_file):
@@ -40,40 +38,7 @@ def browse_files_current_directory(path, output_file):
                         f.write(f"- {class_name} -> {constructor_str}")
 
 
-def main():
-    # check if the number of arguments is valid
-    if len(sys.argv) < 2:
-        print("Usage:", sys.argv[0], "[-r] <path/to/Event/directory> [output_file_name.md]")
-        sys.exit(1)
-
-    # check if -r option is provided
-    if sys.argv[1] == "-r":
-        replace = True
-        del sys.argv[1]
-    else:
-        replace = False
-
-    # path to the folder provided as argument
-    path = sys.argv[1]
-
-    # Create the output directory if it does not exist
-    if len(sys.argv) == 3:
-        output_dir = os.path.dirname(sys.argv[2])
-        if output_dir and not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
-    # check if the output file name is provided as an argument
-    if len(sys.argv) == 3:
-        output_file = sys.argv[2]
-    else:
-        output_file = "dataArrayEvent.txt"
-
-    # check if output file already exists
-    if os.path.exists(output_file) and not replace:
-        print(f"Error: Output file '{output_file}' already exists. Please choose a different name or use the -r option to replace it.")
-        print("Usage:", sys.argv[0], "[-r] <path/to/Event/directory> [output_file_name.md]")
-        sys.exit(1)
-
+def main(path, output_file="dataArrayEvent.txt"):
     # files at the root
     browse_files_current_directory(path, output_file)
 
