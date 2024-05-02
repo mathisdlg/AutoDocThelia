@@ -58,6 +58,10 @@ def parser(loopFolder):
     return dictLoop
 
 
+def getFromCommand():
+    ...
+
+
 def generate_section(title, data):
     section_content = f"\n## {title}\n\n"
 
@@ -156,7 +160,12 @@ def generate_markdown(data, output_path=None):
     with open(output_file_path, "w") as file:
         file.write(content)
 
+def main(loopFolder, loopDoc):
+    print("This is a test version of the loop documentation generator.")
+    for loopFile in parser(loopFolder).values():
+        generate_markdown(loopFile, loopDoc)
+
 if __name__ == "__main__":
     loopFolder = "thelia/core/lib/Thelia/Core/Template/Loop/"
-    test = list(parser(loopFolder).values())[0]
-    generate_markdown(test, "output")
+    for loopFile in parser(loopFolder).values():
+        generate_markdown(loopFile, "output")
