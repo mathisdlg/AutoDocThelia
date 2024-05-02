@@ -17,7 +17,7 @@ Exemple de sortie:
 
 ### Utilisation de eventPreAnalyser.py
 
-Ce script ne peut pas être utilisé en ligne de commande. Vous devez utiliser par thelia-doc.py
+Ce script ne peut pas être utilisé en ligne de commande. Vous devez utiliser thelia-doc.py
 
 ### Fonctionnalités de eventAnalyser.py
 
@@ -66,7 +66,7 @@ Example output:
 
 ### eventPreAnalyser.py usage
 
-This script cannot be used on the command line. You must use by thelia-doc.py
+This script cannot be used on the command line. You must use thelia-doc.py
 
 ### eventAnalyser.py features
 
