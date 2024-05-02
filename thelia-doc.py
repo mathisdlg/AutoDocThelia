@@ -8,7 +8,7 @@ import Modules.loopAnalyser as loops
 def help():
     print("\nThis is the documentation manager. Here are the commands you can use:")
     print("[1] - help: Display this help message")
-    print("[2] - go to hooks documentation manager")
+    print("[2] - generate hooks documentation")
     print("[3] - generate events documentation")
     print("[4] - generate commands documentation")
     print("[5] - generate loops documentation")
