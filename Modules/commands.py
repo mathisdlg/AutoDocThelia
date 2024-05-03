@@ -1,6 +1,6 @@
 from io import TextIOWrapper
 import os
-import asyncio
+import asyncio, aiofiles
 
 
 
@@ -45,7 +45,7 @@ async def getCommands(directory: str) -> dict[str: list[list[str, list[str]]]]:
 
         for fileIndex in fileList:
             tasks.append(asyncio.create_task(matchGetFileConfig(fileIndex, commands, fileList, listExtends, directory)))
-        
+
         for task in tasks:
             await task
             commandAddedOrExtendsAdded = commandAddedOrExtendsAdded or task.result()
@@ -256,7 +256,7 @@ def optionAnalyzer(line: str) -> list[str, str] :
     return arrayOptions
 
 
-def generate_markdown_files(data_command_dict, output_path="."):
+async def generate_markdown_files(data_command_dict, output_path="."):
     """
         function that generates as many markdown files as there are keys in the dictionary
 
@@ -269,45 +269,50 @@ def generate_markdown_files(data_command_dict, output_path="."):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
+    tasks = []
     for dictKey, dictValue in data_command_dict.items():
-        file_name = os.path.join(output_path, dictKey.replace(":", "_").replace("-", "_") + ".md")
-        #file_name = f"{output_path}/{dictKey}.md"
-        with open(file_name, "w+") as f:
-            # Write title with docusaurus
-            f.write(f"---\ntitle: {dictKey}\n---\n\n")
-
-            # write description
-            f.write(f"{dictValue[0]}\n\n")
-            
-            # write usage
-            f.write("## Usage\n\n")
-            f.write(f"`{dictValue[1]}`\n\n")
-            
-            # write arguments
-            if dictValue[2]:
-                f.write("## Argument\n\n")
-                for arg in dictValue[2]:
-                    f.write(f"* `{arg[0]}`: {arg[1]}\n")
-                f.write("\n")
-            
-            # write options
-            if dictValue[3]:
-                f.write("## Option\n\n")
-                for option in dictValue[3]:
-                    f.write(f"* `{option[0]}`: {option[1]}\n")
-                f.write("\n")
-            
-            # write help if available
-            if len(dictValue) > 4 and dictValue[4]:
-                f.write("## Help\n\n")
-                f.write(f"{dictValue[4]}\n")
-            f.seek(0)
-            content = f.read().rstrip() + "\n"
-            f.seek(0)
-            f.write(content)
-            f.truncate()
+        tasks.append(generate_markdown_file(dictKey, dictValue, output_path))
+    
+    await asyncio.gather(*tasks)
 
     return "Markdown file(s) was/were created successfully ✅" 
+
+
+async def generate_markdown_file(command_name: str, command_data: list[str, str, list[list[str, str]], list[list[str, str]]], output_path: str) -> None:
+    async with aiofiles.open(os.path.join(output_path, command_name.replace(":", "_").replace("-", "_") + ".md"), "w+") as f:
+            # Write title with docusaurus
+            await f.write(f"---\ntitle: {command_name}\n---\n\n")
+
+            # write description
+            await f.write(f"{command_data[0]}\n\n")
+            
+            # write usage
+            await f.write("## Usage\n\n")
+            await f.write(f"`{command_data[1]}`\n\n")
+            
+            # write arguments
+            if command_data[2]:
+                await f.write("## Argument\n\n")
+                for arg in command_data[2]:
+                    await f.write(f"* `{arg[0]}`: {arg[1]}\n")
+                await f.write("\n")
+            
+            # write options
+            if command_data[3]:
+                await f.write("## Option\n\n")
+                for option in command_data[3]:
+                    await f.write(f"* `{option[0]}`: {option[1]}\n")
+                await f.write("\n")
+            
+            # write help if available
+            if len(command_data) > 4 and command_data[4]:
+                await f.write("## Help\n\n")
+                await f.write(f"{command_data[4]}\n")
+            await f.seek(0)
+            content = (await f.read()).rstrip() + "\n"
+            await f.seek(0)
+            await f.write(content)
+            await f.truncate()
 
 
 def main(directory: str, output: str = "./output/") -> None:
@@ -316,11 +321,11 @@ def main(directory: str, output: str = "./output/") -> None:
     if output == "":
         output = "./output/"
     dictionnary = asyncio.run(getCommands(directory))
-    print(generate_markdown_files(dictionnary, output))
+    print(asyncio.run(generate_markdown_files(dictionnary, output)))
 
 
 if __name__ == "__main__":
-    directory = input("Enter the directory to scan commands: ")
-    output = input("Enter the output directory for commands [./ouput/]: ")
+    # directory = input("Enter the directory to scan commands: ")
+    # output = input("Enter the output directory for commands [./ouput/]: ")
 
-    main(directory, output)
+    main("thelia")
