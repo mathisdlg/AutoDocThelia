@@ -63,7 +63,13 @@ def getFromCommand():
 
 
 def generate_section(title, data):
-    section_content = f"\n## {title}\n\n"
+    section_content = ""
+    
+    # check if the section is empty
+    if not data:
+        return section_content
+
+    section_content += f"\n## {title}\n\n"
 
     # check if the first element is a list to determine the section type
     if isinstance(data[0], list):
