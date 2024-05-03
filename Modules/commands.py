@@ -277,24 +277,25 @@ def generate_markdown_files(data_command_dict, output_path="."):
             f.write(f"`{dictValue[1]}`\n\n")
             
             # write arguments
-            f.write("## Argument\n\n")
-            for arg in dictValue[2]:
-                f.write(f"* `{arg[0]}`: {arg[1]}\n")
-            f.write("\n")
+            if dictValue[2]:
+                f.write("## Argument\n\n")
+                for arg in dictValue[2]:
+                    f.write(f"* `{arg[0]}`: {arg[1]}\n")
+                f.write("\n")
             
             # write options
-            f.write("## Option\n\n")
-            for option in dictValue[3]:
-                f.write(f"* `{option[0]}`: {option[1]}\n")
-            f.write("\n")
+            if dictValue[3]:
+                f.write("## Option\n\n")
+                for option in dictValue[3]:
+                    f.write(f"* `{option[0]}`: {option[1]}\n")
+                f.write("\n")
             
             # write help if available
-            if len(dictValue) > 4:
+            if len(dictValue) > 4 and dictValue[4]:
                 f.write("## Help\n\n")
-                f.write(f"{dictValue[4]}\n")
+                f.write(f"{dictValue[4]}")
 
-    return "Markdown file(s) was/were created successfully ✅"      
-
+    return "Markdown file(s) was/were created successfully ✅" 
 
 
 def main(directory: str, output: str = "./output/") -> None:
