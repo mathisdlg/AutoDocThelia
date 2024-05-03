@@ -103,8 +103,8 @@ async def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str,
                     if line.startswith("class"):
                         isClass = True
                         name = getCommandName(f)
-                        await launchCommand(name, directory)
-                        config = parseFile(name)
+                        stdout = await launchCommand(name, directory)
+                        config = await parseFile(stdout)
 
                         commands[name] = config
                     listExtends.append(line[line.index("class ") + len("class "):indexExtends].strip())
@@ -166,59 +166,62 @@ def getCommandName(file: TextIOWrapper) -> str :
     return format(commandName.strip()).strip()
 
 
-async def launchCommand(name: str, repository: str) -> str :
-    process = await asyncio.create_subprocess_shell(f"php {repository}/Thelia {name} --help 2> .{name} > .{name}")
-    await process.wait()
+async def launchCommand(name: str, repository: str) -> bytes:
+    absPath = os.path.abspath(repository)
+    process = await (await asyncio.create_subprocess_exec(f"php",  f"{absPath}/Thelia", name, "--help", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)).communicate()
+
+    return process[0]
     
 
 
-def parseFile(name) -> list[str, str, list[list[str, str]], list[list[str, str]]] :
+async def parseFile(stdout: bytes) -> list[str, str, list[list[str, str]], list[list[str, str]]] :
     isDescription = False
     isUsage = False
     isArgument = False
     isOption = False
     isHelp = False
     arrayCommand = ["", "", [], []]
-    fileOpened = open(f".{name}", "r")
-    for line in fileOpened :
+
+    buf = stdout.decode("utf-8").split("\n")
+    print(buf, end="\n\n")
+
+    for line in buf:
         if isDescription :
             arrayCommand[0] = line.strip()
             isDescription = False
-        elif line == "Description:\n" :
+        elif line == "Description:" :
             isDescription = True
             
         if isUsage :
             arrayCommand[1] = line.strip()
             isUsage = False
-        elif line == "Usage:\n" :
+        elif line == "Usage:" :
             isUsage = True
             
         if isArgument :
-            if line != "\n" :
+            if line != "" :
                 arrayCommand[2].append(argumentAnalyzer(line))
             else :
                 isArgument = False
-        elif line == "Arguments:\n" :
+        elif line == "Arguments:" :
             isArgument = True
             
         if isOption :
-            if line != "\n" :
+            if line != "" :
                 if "-h, --help" in line or "-q, --quiet" in line or "-V, --version" in line or "--ansi|--no-ansi" in line or "-n, --no-interaction" in line or "-e, --env=ENV" in line or "--no-debug" in line or "-v|vv|vvv, --verbose" in line :
                     continue
                 else :
                     arrayCommand[3].append(optionAnalyzer(line))
             else :
                 isOption = False
-        elif line == "Options:\n" :
+        elif line == "Options:" :
             isOption = True
             
         if isHelp :
             arrayCommand.append(line.strip())
             isHelp = False
-        elif line == "Help:\n" :
+        elif line == "Help:" :
             isHelp = True
-    fileOpened.close()
-    os.remove(f".{name}")
     return arrayCommand
 
 
