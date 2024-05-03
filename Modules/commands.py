@@ -1,6 +1,5 @@
 from io import TextIOWrapper
 import os
-
 import asyncio
 
 
@@ -59,6 +58,8 @@ async def matchGetFileConfig(fileIndex: list[str], commands: dict[str: list[list
             return True
         case 1:
             return True
+        case 2:
+            return False
     return False
 
 
@@ -90,7 +91,7 @@ async def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str,
         listExtends (list[str]): the list of the extends
 
     Returns:
-        int: 0 if the command has been added, 1 if the extends has been added
+        int: 0 if the command has been added, 1 if the extends has been added, 2 if the command has not been added
     """
     with open(fileIndex[0], "r") as f:
         isClass = False
@@ -103,9 +104,12 @@ async def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str,
                     if line.startswith("class"):
                         isClass = True
                         name = getCommandName(f)
-                        stdout = await launchCommand(name, directory)
-                        config = await parseFile(stdout)
+                        stdout, retCode = await launchCommand(name, directory)
+                        if retCode:
+                            fileList.remove(fileIndex)
+                            return 2
 
+                        config = await parseFile(stdout)
                         commands[name] = config
                     listExtends.append(line[line.index("class ") + len("class "):indexExtends].strip())
                     fileList.remove(fileIndex)
@@ -168,9 +172,10 @@ def getCommandName(file: TextIOWrapper) -> str :
 
 async def launchCommand(name: str, repository: str) -> bytes:
     absPath = os.path.abspath(repository)
-    process = await (await asyncio.create_subprocess_exec(f"php",  f"{absPath}/Thelia", name, "--help", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)).communicate()
+    process = await asyncio.create_subprocess_exec(f"php",  f"{absPath}/Thelia", name, "--help", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+    pipes = await process.communicate()
 
-    return process[0]
+    return pipes[0], process.returncode
     
 
 
@@ -183,7 +188,6 @@ async def parseFile(stdout: bytes) -> list[str, str, list[list[str, str]], list[
     arrayCommand = ["", "", [], []]
 
     buf = stdout.decode("utf-8").split("\n")
-    print(buf, end="\n\n")
 
     for line in buf:
         if isDescription :
