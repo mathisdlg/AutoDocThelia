@@ -297,6 +297,13 @@ def generate_markdown_files(data_command_dict, output_path="."):
             if len(dictValue) > 4 and dictValue[4]:
                 f.write("## Help\n\n")
                 f.write(f"{dictValue[4]}")
+    
+    # markdown layout (spaces)
+    with open(file_name, "r+") as f:
+        content = f.read().rstrip() + "\n"
+        f.seek(0)
+        f.write(content)
+        f.truncate()
 
     return "Markdown file(s) was/were created successfully ✅" 
 
