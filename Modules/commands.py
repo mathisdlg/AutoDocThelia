@@ -270,9 +270,9 @@ def generate_markdown_files(data_command_dict, output_path="."):
         os.makedirs(output_path)
 
     for dictKey, dictValue in data_command_dict.items():
-        file_name = os.path.join(output_path, dictKey+".md")
+        file_name = os.path.join(output_path, dictKey.replace(":", "_").replace("-", "_") + ".md")
         #file_name = f"{output_path}/{dictKey}.md"
-        with open(file_name, "w") as f:
+        with open(file_name, "w+") as f:
             # Write title with docusaurus
             f.write(f"---\ntitle: {dictKey}\n---\n\n")
 
