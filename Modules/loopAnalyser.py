@@ -20,34 +20,23 @@ def parser(loopFolder):
                         break
                     elif line.startswith("class"):
                         loopTmpDict["Name"] = line.split(" ")[1].strip()
-                    elif "#doc-usage" in line:
-                        if loopTmpDict.get("Desc") is None:
-                            loopTmpDict["Desc"] = "`"+line.split("#doc-usage")[1].strip()+"`"
-                        else:
-                            loopTmpDict["Desc"] += "  \n"+"`"+line.split("#doc-usage")[1].strip()+"`"
                     elif "#doc-desc" in line:
                         desc = line.split("#doc-desc")[1].strip()
-                        if loopTmpDict.get("Desc") is None:
-                            loopTmpDict["Desc"] = desc
-                        else:
-                            loopTmpDict["Desc"] = desc+"  \n"+loopTmpDict["Desc"]
+                        loopTmpDict["Desc"] = desc
+                        snakeCaseName = "".join([c if c.islower() else f"_{c.lower()}" for c in loopTmpDict["Name"]]).strip()
+                        loopTmpDict["Desc"] += '`{loop type="'+snakeCaseName+'" name="the-loop-name" [argument="value"], [...]}`'
                     elif "#doc-arg-name" in line:
                         name = line.split("#doc-arg-name")[1].strip()
                         desc = ""
-                        default = ""
                         example = ""
-                        for x in range(1, 4):
+                        for x in range(1, 3):
                             nextLine = lines[i+x]
-                            if "*/" in nextLine or nextLine.strip().split("*")[1].strip() == "":
-                                break
-                            match nextLine.strip().split(" ")[1]: # TODO
+                            match nextLine.strip().split(" ")[1]:
                                 case "#doc-arg-desc":
                                     desc = nextLine.split("#doc-arg-desc")[1].strip()
-                                case "#doc-arg-default":
-                                    default = nextLine.split("#doc-arg-default")[1].strip()
                                 case "#doc-arg-example":
                                     example = nextLine.split("#doc-arg-example")[1].strip()
-                        args.append([name, desc, default, example])
+                        args.append([name, desc, "", example])
                     elif "#doc-out-name" in line:
                         name = line.split("#doc-out-name")[1].strip()
                         value = lines[i+1].split("#doc-out-desc")[1].strip()
