@@ -1,6 +1,9 @@
 from io import TextIOWrapper
 import os
 
+import asyncio
+
+
 
 
 def printAndStop(things: any) -> None:
@@ -13,7 +16,7 @@ def printAndStop(things: any) -> None:
     input("Press enter to continue")
 
 
-def getCommands(directory: str) -> dict[str: list[list[str, list[str]]]]:
+async def getCommands(directory: str) -> dict[str: list[list[str, list[str]]]]:
     """Get all the commands in the directory
 
     Args:
@@ -39,16 +42,24 @@ def getCommands(directory: str) -> dict[str: list[list[str, list[str]]]]:
 
     while commandAddedOrExtendsAdded:
         commandAddedOrExtendsAdded = False
+        tasks = []
+
         for fileIndex in fileList:
-            match getFileConfig(fileIndex, commands, fileList, listExtends, directory):
-                case 0:
-                    commandAddedOrExtendsAdded = True
-                case 1:
-                    commandAddedOrExtendsAdded = True
-    
-    os.remove(".tmpCmdHelp")
+            tasks.append(asyncio.create_task(matchGetFileConfig(fileIndex, commands, fileList, listExtends, directory)))
+        
+        for task in tasks:
+            await task
+            commandAddedOrExtendsAdded = commandAddedOrExtendsAdded or task.result()
 
     return commands
+
+async def matchGetFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str], directory: str) -> bool:
+    match await getFileConfig(fileIndex, commands, fileList, listExtends, directory):
+        case 0:
+            return True
+        case 1:
+            return True
+    return False
 
 
 def canBeACommand(path: str) -> int:
@@ -69,7 +80,7 @@ def canBeACommand(path: str) -> int:
     return -1
 
 
-def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str], directory: str) -> int:
+async def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[str]]]], fileList: list[str], listExtends: list[str], directory: str) -> int:
     """Get the config of the file
 
     Args:
@@ -92,8 +103,9 @@ def getFileConfig(fileIndex: list[str], commands: dict[str: list[list[str, list[
                     if line.startswith("class"):
                         isClass = True
                         name = getCommandName(f)
-                        launchCommand(name, directory)
-                        config = parseFile()
+                        await launchCommand(name, directory)
+                        config = parseFile(name)
+
                         commands[name] = config
                     listExtends.append(line[line.index("class ") + len("class "):indexExtends].strip())
                     fileList.remove(fileIndex)
@@ -154,18 +166,20 @@ def getCommandName(file: TextIOWrapper) -> str :
     return format(commandName.strip()).strip()
 
 
-def launchCommand(name: str, repository: str) -> str :
-    os.system(f"php {repository}/Thelia {name} --help 2> .tmpCmdHelp > .tmpCmdHelp")
+async def launchCommand(name: str, repository: str) -> str :
+    process = await asyncio.create_subprocess_shell(f"php {repository}/Thelia {name} --help 2> .{name} > .{name}")
+    await process.wait()
+    
 
 
-def parseFile() -> list[str, str, list[list[str, str]], list[list[str, str]]] :
+def parseFile(name) -> list[str, str, list[list[str, str]], list[list[str, str]]] :
     isDescription = False
     isUsage = False
     isArgument = False
     isOption = False
     isHelp = False
     arrayCommand = ["", "", [], []]
-    fileOpened = open(".tmpCmdHelp", "r")
+    fileOpened = open(f".{name}", "r")
     for line in fileOpened :
         if isDescription :
             arrayCommand[0] = line.strip()
@@ -203,6 +217,8 @@ def parseFile() -> list[str, str, list[list[str, str]], list[list[str, str]]] :
             isHelp = False
         elif line == "Help:\n" :
             isHelp = True
+    fileOpened.close()
+    os.remove(f".{name}")
     return arrayCommand
 
 
@@ -286,11 +302,12 @@ def main(directory: str, output: str = "./output/") -> None:
     """
     if output == "":
         output = "./output/"
-    dictionnary = getCommands(directory)
+    dictionnary = asyncio.run(getCommands(directory))
     print(generate_markdown_files(dictionnary, output))
 
 
 if __name__ == "__main__":
     directory = input("Enter the directory to scan commands: ")
     output = input("Enter the output directory for commands [./ouput/]: ")
+
     main(directory, output)
