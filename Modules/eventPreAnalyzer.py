@@ -77,4 +77,6 @@ def main(path, output_file="dataArrayEvent.txt"):
     with open(output_file, 'w') as f:
         f.write(str(data))
 
-main("../../thelia/core/lib/Thelia/Core/Event")
+if __name__ == "__main__":
+    path = input("Enter the path to the event directory: ")
+    main(path)
