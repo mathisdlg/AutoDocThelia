@@ -5,47 +5,69 @@ import os
 def parser(loopFolder):
     dictLoop = {}
     for loopFile in sorted(os.listdir(loopFolder)):
-        if loopFile.endswith(".php"):
-            with open(os.path.join(loopFolder, loopFile), "r") as file:
-                loopTmpDict = {}
-                abstract = False
-                args = [["Argument", "Description", "Default", "Example"]]
-                outputs = [["Name", "Value"]]
-                orders = [["Ascendant", "Descendant", "Sorted field"]]
-                lines = file.readlines()
-                for i in range(0, len(lines)):
-                    line = lines[i]
-                    if line.startswith("abstract"):
-                        abstract = True
-                        break
-                    elif line.startswith("class"):
-                        loopTmpDict["Name"] = line.split(" ")[1].strip()
-                    elif "#doc-desc" in line:
-                        desc = line.split("#doc-desc")[1].strip()
+        if not loopFile.endswith(".php"):
+            continue
+
+        with open(os.path.join(loopFolder, loopFile), "r") as file:
+            loopTmpDict = {}
+            abstract = False
+            descBoolean = False
+            args = [["Argument", "Type", "Description", "Mandatory", "Default", "Example"]]
+            outputs = [["Name", "Value"]]
+            orders = [["Ascendant", "Descendant", "Sorted field"]]
+            lines = file.readlines()
+            for i in range(0, len(lines)):
+                line = lines[i]
+                if line.startswith("abstract"):
+                    abstract = True
+                    break
+                elif line.startswith("class"):
+                    loopTmpDict["Name"] = line.split(" ")[1].strip()
+                    snackCaseName = "".join([c if c.islower() else f"_{c.lower()}" for c in loopTmpDict["Name"]]).strip()
+                    if descBoolean:
+                        loopTmpDict["Desc"] += '`{loop type="'+snackCaseName+'" name="the-loop-name" [argument="value"], [...]}`'
+                    else:
+                        loopTmpDict["Desc"] = '`{loop type="'+snackCaseName+'" name="the-loop-name" [argument="value"], [...]}`'
+                        descBoolean = True
+                elif "#doc-desc" in line:
+                    desc = line.split("#doc-desc")[1].strip()
+                    if descBoolean:
+                        loopTmpDict["Desc"] = desc + "\n" + loopTmpDict["Desc"]
+                    else:
                         loopTmpDict["Desc"] = desc
-                        snakeCaseName = "".join([c if c.islower() else f"_{c.lower()}" for c in loopTmpDict["Name"]]).strip()
-                        loopTmpDict["Desc"] += '`{loop type="'+snakeCaseName+'" name="the-loop-name" [argument="value"], [...]}`'
-                    elif "#doc-arg-name" in line:
-                        name = line.split("#doc-arg-name")[1].strip()
-                        desc = ""
-                        example = ""
-                        for x in range(1, 3):
-                            nextLine = lines[i+x]
-                            match nextLine.strip().split(" ")[1]:
-                                case "#doc-arg-desc":
-                                    desc = nextLine.split("#doc-arg-desc")[1].strip()
-                                case "#doc-arg-example":
-                                    example = nextLine.split("#doc-arg-example")[1].strip()
-                        args.append([name, desc, "", example])
-                    elif "#doc-out-name" in line:
-                        name = line.split("#doc-out-name")[1].strip()
-                        value = lines[i+1].split("#doc-out-desc")[1].strip()
-                        outputs.append([name, value])
-                            
-            if not abstract:
-                dictLoop[loopFile] = [loopTmpDict["Name"], loopTmpDict["Desc"], args, outputs, orders]
+                        descBoolean = True
+                elif "#doc-arg-desc" in line:
+                    name = line.split("#doc-arg-desc")[1].strip()
+                    nextLine = lines[i+1].strip().replace('"', "'")
+                    if "Argument" not in nextLine:
+                        raise Exception(f"Error in line {i+1} of {loopFile} : #doc-arg-desc must be followed by an Argument object")
+
+                    if nextLine.endswith("("):
+                        searchLine = lines[i+2].strip().replace('"', "'")
+                    else:
+                        searchLine = nextLine
+
+                    if "Argument::" in nextLine or nextLine.startswith("new"):
+                        name = searchLine.split("'")[1]
+                    else:
+                        raise Exception(f"Error in line {i+1} of {loopFile} : #doc-arg-desc must be followed by an Argument object")
+                    args.append([name, "", desc, "", "", ""])
+                elif "#doc-out-desc" in line:
+                    desc = line.split("#doc-out-desc")[1].strip()
+                    if "->set(" not in lines[i+1]:
+                        raise Exception(f"Error in line {i+1} of {loopFile} : #doc-out-desc must be followed by an Output object")
+                    if lines[i+1].strip().endswith("("):
+                        name = lines[i+2].split("'")[1]
+                    else:
+                        name = lines[i+1].split("'")[1]
+                    outputs.append([name, desc])
+                        
+        if not abstract:
+            dictLoop[loopFile] = [loopTmpDict["Name"], loopTmpDict["Desc"], args, outputs, orders]
     return dictLoop
 
+def updateDictWithCommands(loopDict, theliaRoot):
+    ...
 
 def getFromCommand():
     ...
@@ -155,12 +177,21 @@ def generate_markdown(data, output_path=None):
     with open(output_file_path, "w") as file:
         file.write(content)
 
-def main(loopFolder, loopDoc):
+def main(theliaRoot, loopDoc="output"):
     print("This is a test version of the loop documentation generator.")
-    for loopFile in parser(loopFolder).values():
+
+    loopFolder = os.path.join(theliaRoot, "core/lib/Thelia/Core/Template/Loop/")
+
+    loopDict = parser(loopFolder)
+    updateDictWithCommands(loopDict, theliaRoot)
+    for loopFile in loopDict.values():
         generate_markdown(loopFile, loopDoc)
 
 if __name__ == "__main__":
-    loopFolder = "thelia/core/lib/Thelia/Core/Template/Loop/"
-    for loopFile in parser(loopFolder).values():
-        generate_markdown(loopFile, "output")
+    theliaRoot = "thelia"
+    # try:
+    #     main(theliaRoot)
+    # except Exception as e:
+    #     print(f"An error occurred: {e}")
+    
+    main(theliaRoot)
