@@ -5,13 +5,13 @@ from subprocess import Popen, PIPE
 
 def snake_case(name):
     """
-    From a ThatString to a that_string
+    From "ThatString" to "that_string"
     """
     return name[0].lower() + "".join([c if c.islower() else f"_{c.lower()}" for c in name[1::]]).strip()
 
 def CamelCase(name):
     """
-    From a that_string to a ThatString
+    From "that_string" to "ThatString"
     """
     string = ""
     for char in name.split("_"):
@@ -19,7 +19,21 @@ def CamelCase(name):
     return string
 
 
-def parser(loopFolder):
+def parser(loopFolder: str) -> dict:
+    """
+    Parse the loop folder to extract the information needed to generate the documentation
+
+    Args:
+        loopFolder (str): The path to the loop folder
+
+    Raises:
+        Exception: #doc-arg-desc must be followed by an Argument object
+        Exception: #doc-out-desc must be followed by an Output object
+
+    Returns:
+        dict: the dictionary containing the loop information to generate the documentation wih a specific format which is :
+        {"loopFile.php": [Name: str, Desc: str , Args: list[list["Argument", "Type", "Description", "Mandatory", "Default", "Example"]], Outputs: list[list["Name", "Value"]], Orders: list[list["Ascendant", "Descendant", "Sorted field"]], Enums: dict[str, list[str]]]}
+    """
     dictLoop = {}
     for loopFile in sorted(os.listdir(loopFolder)):
         if not loopFile.endswith(".php"):
@@ -81,9 +95,19 @@ def parser(loopFolder):
                         
         if not abstract:
             dictLoop[loopFile] = [loopTmpDict["Name"], loopTmpDict["Desc"], args, outputs, orders, {}] # [Name, Desc, Args, Outputs, Orders, Enums]
-    return dictLoop
+    return dictLoop # {"loopFile.php": [Name, Desc, Args, Outputs, Orders, Enums]}
 
-def updateDictWithCommands(loopDict, theliaRoot) -> dict:
+def updateDictWithCommands(loopDict: dict, theliaRoot: str) -> dict:
+    """
+    Update the loop dictionary with the Matthias commands
+
+    Args:
+        loopDict (dict): The dictionary containing the loop information
+        theliaRoot (str): The path to the Thelia root
+
+    Returns:
+        dict: The updated loop dictionary
+    """
     pipes = Popen(["php", os.path.join(theliaRoot, "Thelia"), "loop:info", "--all"], stdout=PIPE, stderr=PIPE)
     commands, _ = pipes.communicate()
     pipes.kill()
@@ -260,8 +284,6 @@ def generate_markdown(data, output_path=None):
         file.write(content)
 
 def main(theliaRoot, loopDoc="output"):
-    print("This is a test version of the loop documentation generator.")
-
     loopFolder = os.path.join(theliaRoot, "core/lib/Thelia/Core/Template/Loop/")
     
     loopDict = updateDictWithCommands(parser(loopFolder), theliaRoot)
