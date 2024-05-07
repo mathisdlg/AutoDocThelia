@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys, os
-import Modules.hooks as hooks, Modules.events as events, Modules.commands as commands, Modules.check as check
+import Modules.hooks as hooks, Modules.events as events, Modules.commands as commands
 import Modules.loopAnalyser as loops
 
 
@@ -74,7 +74,7 @@ def generate(rootThelia, rootDoc, orderHook="y"):
 
 
 def check():
-    raise NotImplementedError("Not implemented yet")
+    raise NotImplementedError("Not yet implemented")
 
 
 
