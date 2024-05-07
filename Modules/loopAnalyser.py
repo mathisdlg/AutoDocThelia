@@ -1,6 +1,23 @@
-import os
+import os, json
+from subprocess import Popen, PIPE
 
 # To analyze loop files and generate the documentation associated with the code
+
+def snake_case(name):
+    """
+    From a ThatString to a that_string
+    """
+    return name[0].lower() + "".join([c if c.islower() else f"_{c.lower()}" for c in name[1::]]).strip()
+
+def CamelCase(name):
+    """
+    From a that_string to a ThatString
+    """
+    string = ""
+    for char in name.split("_"):
+        string += char.capitalize()
+    return string
+
 
 def parser(loopFolder):
     dictLoop = {}
@@ -23,16 +40,16 @@ def parser(loopFolder):
                     break
                 elif line.startswith("class"):
                     loopTmpDict["Name"] = line.split(" ")[1].strip()
-                    snackCaseName = "".join([c if c.islower() else f"_{c.lower()}" for c in loopTmpDict["Name"]]).strip()
+                    snackCaseName = snake_case(loopTmpDict["Name"])
                     if descBoolean:
-                        loopTmpDict["Desc"] += '`{loop type="'+snackCaseName+'" name="the-loop-name" [argument="value"], [...]}`'
+                        loopTmpDict["Desc"] += '  \n`{loop type="'+snackCaseName+'" name="the-loop-name" [argument="value"], [...]}`'
                     else:
                         loopTmpDict["Desc"] = '`{loop type="'+snackCaseName+'" name="the-loop-name" [argument="value"], [...]}`'
                         descBoolean = True
                 elif "#doc-desc" in line:
                     desc = line.split("#doc-desc")[1].strip()
                     if descBoolean:
-                        loopTmpDict["Desc"] = desc + "\n" + loopTmpDict["Desc"]
+                        loopTmpDict["Desc"] = desc + "  \n" + loopTmpDict["Desc"]
                     else:
                         loopTmpDict["Desc"] = desc
                         descBoolean = True
@@ -63,14 +80,74 @@ def parser(loopFolder):
                     outputs.append([name, desc])
                         
         if not abstract:
-            dictLoop[loopFile] = [loopTmpDict["Name"], loopTmpDict["Desc"], args, outputs, orders]
+            dictLoop[loopFile] = [loopTmpDict["Name"], loopTmpDict["Desc"], args, outputs, orders, {}] # [Name, Desc, Args, Outputs, Orders, Enums]
     return dictLoop
 
-def updateDictWithCommands(loopDict, theliaRoot):
-    ...
+def updateDictWithCommands(loopDict, theliaRoot) -> dict:
+    pipes = Popen(["php", os.path.join(theliaRoot, "Thelia"), "loop:info", "--all"], stdout=PIPE, stderr=PIPE)
+    commands, _ = pipes.communicate()
+    pipes.kill()
+    json_data = json.loads(commands)
+    for loopKey in list(json_data.keys()):
+        if "-" in loopKey:
+            loopKeyModified = loopKey.replace("-", "_")
+            json_data[loopKeyModified] = json_data.pop(loopKey)
 
-def getFromCommand():
-    ...
+    for loop in loopDict.keys():
+        print(json_data[snake_case(loop[0:-4])])
+        jsonLoopTmp = json_data[snake_case(loop[0:-4])]
+        if jsonLoopTmp["warning"] != "" and jsonLoopTmp["warning"] != None:
+            loopDict[loop][1] = "Warning:" + jsonLoopTmp["warning"] + "  \n" + loopDict[loop][1]
+
+        # args = [["Argument", "Type", "Description", "Mandatory", "Default", "Example"]]
+        argList = [ arg[0] for arg in loopDict[loop][2] ]
+        if "args" not in jsonLoopTmp:
+            continue
+        
+        extend = snake_case(jsonLoopTmp["extends"].split("\\")[-1])
+        argsOfExtend = []
+        if extend in json_data:
+            loopDict[loop][1] += f"  \nThis loop is an extend of [{extend}](./{CamelCase(extend)}) loop."
+            argsOfExtend = [arg[0] for arg in json_data[extend]["args"]]
+
+        for arg in jsonLoopTmp["args"]:
+            if arg in argList:
+                index = argList.index(arg)
+
+                # if arg in argsOfExtend:
+                #     del loopDict[loop][2][index]
+                #     continue
+
+                loopDict[loop][2][index][1] = jsonLoopTmp["args"][arg][0]
+
+                if jsonLoopTmp["args"][arg][1] == None:
+                    loopDict[loop][2][index][3] = ""
+                else:
+                    loopDict[loop][2][index][3] = jsonLoopTmp["args"][arg][1]
+
+                if jsonLoopTmp["args"][arg][2] == None:
+                    loopDict[loop][2][index][4] = ""
+                else:
+                    loopDict[loop][2][index][4] = jsonLoopTmp["args"][arg][2]
+
+                loopDict[loop][2][index][5] = jsonLoopTmp["args"][arg][3]
+        
+        # orders = [["Ascendant", "Descendant", "Sorted field"]]
+        if "enums" not in jsonLoopTmp:
+            continue
+
+        for enum in jsonLoopTmp["enums"]:
+            if enum == "order":
+                for order in jsonLoopTmp["enums"]["order"]:
+                    loopDict[loop][4].append([order[0], order[1], ""])
+            else:
+                loopDict[loop][5][enum] = [[enum]] # To do table for enums with the generate section function
+                for enumValue in jsonLoopTmp["enums"][enum]:
+                    if enumValue in loopDict[loop][5][enum]:
+                        continue
+                    loopDict[loop][5][enum].append(enumValue)
+
+    return loopDict
 
 
 def generate_section(title, data):
@@ -140,7 +217,7 @@ def copy_examples_section(file_content):
 
 
 def generate_markdown(data, output_path=None):
-    title, description, arguments, outputs, orders = data
+    title, description, arguments, outputs, orders, enums = data
 
     # read the content of the Markdown file and retrieve "Example" if they exist
     try:
@@ -161,8 +238,13 @@ def generate_markdown(data, output_path=None):
     # add the "Examples" section copied from the file if it exists
     if examples_content:
         content = content + "\n" + examples_content
+    
+    if len(enums) > 0:
+        for enum in enums:
+            content += generate_section(enum, enums[enum])
 
-    content += generate_section("Orders", orders)
+    if len(orders) > 1:
+        content += generate_section("Orders", orders)
 
     # determine the output file path
     if output_path:
@@ -181,9 +263,9 @@ def main(theliaRoot, loopDoc="output"):
     print("This is a test version of the loop documentation generator.")
 
     loopFolder = os.path.join(theliaRoot, "core/lib/Thelia/Core/Template/Loop/")
+    
+    loopDict = updateDictWithCommands(parser(loopFolder), theliaRoot)
 
-    loopDict = parser(loopFolder)
-    updateDictWithCommands(loopDict, theliaRoot)
     for loopFile in loopDict.values():
         generate_markdown(loopFile, loopDoc)
 
