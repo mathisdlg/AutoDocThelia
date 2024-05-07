@@ -69,7 +69,6 @@ def generate(rootThelia, rootDoc, orderHook="y"):
 
     events.main(theliaEvents, eventsDoc)
     hooks.all(rootThelia, hooksDoc, orderHook)
-    hooks.clean()
     commands.main(rootThelia, commandsDoc)
     loops.main(rootThelia, loopDoc)
 
