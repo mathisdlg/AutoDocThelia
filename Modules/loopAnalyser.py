@@ -118,7 +118,6 @@ def updateDictWithCommands(loopDict: dict, theliaRoot: str) -> dict:
             json_data[loopKeyModified] = json_data.pop(loopKey)
 
     for loop in loopDict.keys():
-        print(json_data[snake_case(loop[0:-4])])
         jsonLoopTmp = json_data[snake_case(loop[0:-4])]
         if jsonLoopTmp["warning"] != "" and jsonLoopTmp["warning"] != None:
             loopDict[loop][1] = "Warning:" + jsonLoopTmp["warning"] + "  \n" + loopDict[loop][1]
@@ -293,9 +292,5 @@ def main(theliaRoot, loopDoc="output"):
 
 if __name__ == "__main__":
     theliaRoot = "thelia"
-    # try:
-    #     main(theliaRoot)
-    # except Exception as e:
-    #     print(f"An error occurred: {e}")
     
     main(theliaRoot)
