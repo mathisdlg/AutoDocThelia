@@ -196,6 +196,8 @@ def all(directory: str, toFile: str, order: str = "y") -> None:
         print("Hooks successfully integrated.")
     except Exception as e:
         print("An error occured in integrate.\n", e)
+    
+    clean()
 
 
 def clean() -> None:
