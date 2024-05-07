@@ -7,7 +7,8 @@ def snake_case(name):
     """
     From "ThatString" to "that_string"
     """
-    return name[0].lower() + "".join([c if c.islower() else f"_{c.lower()}" for c in name[1::]]).strip()
+    name = name.replace("-", "_")
+    return name[0].lower() + "".join([c if not c.isalpha() or c.islower() else f"_{c.lower()}" for c in name[1::]]).strip()
 
 def CamelCase(name):
     """
@@ -82,19 +83,24 @@ def parser(loopFolder: str) -> dict:
                         name = searchLine.split("'")[1]
                     else:
                         raise Exception(f"Error in line {i+1} of {loopFile} : #doc-arg-desc must be followed by an Argument object")
+
                     args.append([name, "", desc, "", "", ""])
                 elif "#doc-out-desc" in line:
                     desc = line.split("#doc-out-desc")[1].strip()
                     if "->set(" not in lines[i+1]:
                         raise Exception(f"Error in line {i+1} of {loopFile} : #doc-out-desc must be followed by an Output object")
+
                     if lines[i+1].strip().endswith("("):
                         name = lines[i+2].split("'")[1]
                     else:
                         name = lines[i+1].split("'")[1]
-                    outputs.append([name, desc])
+                    
+                    if name not in [output[0] for output in outputs]:
+                        outputs.append([name, desc])
                         
         if not abstract:
             dictLoop[loopFile] = [loopTmpDict["Name"], loopTmpDict["Desc"], args, outputs, orders, {}] # [Name, Desc, Args, Outputs, Orders, Enums]
+
     return dictLoop # {"loopFile.php": [Name, Desc, Args, Outputs, Orders, Enums]}
 
 def updateDictWithCommands(loopDict: dict, theliaRoot: str) -> dict:
@@ -111,11 +117,12 @@ def updateDictWithCommands(loopDict: dict, theliaRoot: str) -> dict:
     pipes = Popen(["php", os.path.join(theliaRoot, "Thelia"), "loop:info", "--all"], stdout=PIPE, stderr=PIPE)
     commands, _ = pipes.communicate()
     pipes.kill()
+
     json_data = json.loads(commands)
+
     for loopKey in list(json_data.keys()):
         if "-" in loopKey:
-            loopKeyModified = loopKey.replace("-", "_")
-            json_data[loopKeyModified] = json_data.pop(loopKey)
+            json_data[snake_case(loopKey)] = json_data.pop(loopKey)
 
     for loop in loopDict.keys():
         jsonLoopTmp = json_data[snake_case(loop[0:-4])]
@@ -239,15 +246,14 @@ def copy_examples_section(file_content):
 
 
 
-def generate_markdown(data, output_path=None):
+def generate_markdown(data, output_path="output"):
     title, description, arguments, outputs, orders, enums = data
 
     # read the content of the Markdown file and retrieve "Example" if they exist
-    try:
-        with open(f"{title.replace(' ', '_')}.md", "r") as file:
+    file_content = ""
+    if os.path.exists(f"{title}.md"):
+        with open(f"{title}.md", "r") as file:
             file_content = file.read()
-    except FileNotFoundError:
-        file_content = ""
 
     examples_content = copy_examples_section(file_content)
 
@@ -269,18 +275,15 @@ def generate_markdown(data, output_path=None):
     if len(orders) > 1:
         content += generate_section("Orders", orders)
 
-    # determine the output file path
-    if output_path:
-        # create the directory if it doesn't exist
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-        output_file_path = f"{output_path}/{title.replace(' ', '_')}.md"
-    else:
-        output_file_path = f"{title.replace(' ', '_')}.md"
+    # create the directory if it doesn't exist
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    output_file_path = os.path.join(output_path, f"{title}.md")
 
     # write to the Markdown file
     with open(output_file_path, "w") as file:
         file.write(content)
+
 
 def main(theliaRoot, loopDoc="output"):
     loopFolder = os.path.join(theliaRoot, "core/lib/Thelia/Core/Template/Loop/")
