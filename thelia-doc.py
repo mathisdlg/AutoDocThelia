@@ -42,7 +42,7 @@ def interacive():
                 toFile = input("Enter the documentation path to modify: ")
                 commands.main(directory, toFile)
             case '5':
-                loopFolder = input("Enter the path to the loop folder: ")
+                loopFolder = input("Enter the path to the root of thelia: ")
                 loopDoc = input("Enter the path to the loop documentation file: ")
                 loops.main(loopFolder, loopDoc)
             case '9':
@@ -66,13 +66,12 @@ def generate(rootThelia, rootDoc, orderHook="y"):
     loopDoc = os.path.join(rootDoc, "docs/loops/")
 
     theliaEvents = os.path.join(rootThelia, "core/lib/Thelia/Core/Event/")
-    theliaLoops = os.path.join(rootThelia, "core/lib/Thelia/Core/Template/Loop/")
 
     events.main(theliaEvents, eventsDoc)
     hooks.all(rootThelia, hooksDoc, orderHook)
     hooks.clean()
     commands.main(rootThelia, commandsDoc)
-    loops.main(theliaLoops, loopDoc)
+    loops.main(rootThelia, loopDoc)
 
 
 def check():
