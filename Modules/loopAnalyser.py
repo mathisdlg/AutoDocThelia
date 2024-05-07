@@ -114,9 +114,9 @@ def updateDictWithCommands(loopDict, theliaRoot) -> dict:
             if arg in argList:
                 index = argList.index(arg)
 
-                # if arg in argsOfExtend:
-                #     del loopDict[loop][2][index]
-                #     continue
+                if arg in argsOfExtend:
+                    del loopDict[loop][2][index]
+                    continue
 
                 loopDict[loop][2][index][1] = jsonLoopTmp["args"][arg][0]
 
