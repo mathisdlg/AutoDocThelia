@@ -22,15 +22,29 @@ Voir plus de [détails](./README_events.md)
 
 Voir plus de [détails](./README_commands.md)
 
-## Contraintes pour la documentation des hooks
-
-- Le répertoire contenant les templates doit impérativement s'appeler 'templates'.
-
 ## Contraintes pour la documentation des loops
 
-- Pour reconnaitre le titre, description, arguments et outputs, le script se réfère à l'ordre des données reçues dans le tableau.
-- La section 'Example' est reconnue grâce au patterne '## Example', ⚠️ si elle est présente dans le fichier portant le nom de la loop courrante, elle sera copié puis collé dans la nouvelle documentation sans être modifiée.
-- Les liens faccultatifs placés après les outputs et les arguments sont reconnus grâce à leurs position à la fin d'un tableau ainsi qu'à leurs type différent de 'list'.
+- Toutes les loops doivent avoir un tag `#doc-desc` dans le code
+- Chaque argument doit être précédé d'un tag `#doc-arg-desc` comme suit:  
+
+```php
+// #doc-arg-desc A comma separated list of user roles
+new Argument(
+    'role',
+    new TypeCollection(
+        new AlphaNumStringListType()
+    ),
+    null,
+    true
+),
+```
+
+- Chaque sortie doit être précédée d'un tag `#doc-out-desc` comme suit:  
+
+```php
+// #doc-out-desc the admin locale
+->set('LOCALE', $admin->getLocale())
+```
 
 Voir plus de [détails](./README_loop.md)
 
@@ -58,14 +72,28 @@ Get more [details](./README_events.md)
 
 Get more [details](./README_commands.md)
 
-## Constraints for hook documentation
-
-- The directory containing the templates must be called 'templates'.
-
 ## Constraints for loop documentation
 
-- To recognize the title, description, arguments and outputs, the script refers to the order of the data received in the table.
-- The 'Example' section is recognized using the '## Example' pattern, ⚠️ if it is present in the file bearing the name of the current loop, it will be copied then pasted into the new documentation without being modified.
-- Optional links placed after outputs and arguments are recognized thanks to their position at the end of an array as well as their different type of 'list'.
+- All loops must have a `#doc-desc` tag in the code
+- Each argument must be preceded by a `#doc-arg-desc` tag as follows:  
+
+```php
+// #doc-arg-desc A comma separated list of user roles
+new Argument(
+    'role',
+    new TypeCollection(
+        new AlphaNumStringListType()
+    ),
+    null,
+    true
+),
+```
+
+- Each output must be preceded by a `#doc-out-desc` tag as follows:  
+
+```php
+// #doc-out-desc the admin locale
+->set('LOCALE', $admin->getLocale())
+```
 
 View more [details](./README_loop.md)
